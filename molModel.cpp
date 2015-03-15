@@ -17,13 +17,13 @@ MolModel::MolModel(QObject* parent) : QAbstractTableModel(parent) {
 }
 
 // rowCount returns the number of rows in the model
-int MolModel::rowCount(const QModelIndex &parent) const {
+int MolModel::rowCount(const QModelIndex& parent) const {
   Q_UNUSED(parent)
   return mols_.size();
 }
 
 // columnCount returns the number of columns in the model
-int MolModel::columnCount(const QModelIndex &parent) const {
+int MolModel::columnCount(const QModelIndex& parent) const {
   Q_UNUSED(parent)
   return labels_.size();
 }
@@ -39,7 +39,7 @@ QVariant MolModel::headerData(int section, Qt::Orientation orientation, int role
 }
 
 // data returns the data contained at index
-QVariant MolModel::data(const QModelIndex &index, int role) const {
+QVariant MolModel::data(const QModelIndex& index, int role) const {
   if (role == Qt::DisplayRole) {
     auto row = index.row();
     switch (index.column()) {
@@ -56,4 +56,44 @@ QVariant MolModel::data(const QModelIndex &index, int role) const {
     }
   }
   return QVariant();
+}
+
+
+// setData enables editing of model properties via model views
+bool MolModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+  if (role == Qt::EditRole) {
+    Molecule& m = mols_[index.row()];
+    QString type;
+    bool ok = false;
+    double D = 0.0;
+    switch (index.column()) {
+      case 0:
+        m.name = value.toString();
+        break;
+      case 1:
+        D = value.toFloat(&ok);
+        if (ok) {
+          m.D = D;
+        } else {
+          return false;
+        }
+        break;
+      case 2:
+        type = value.toString();
+        if (type == "2D") {
+          m.type = MolType::SURF;
+        } else if (type == "3D") {
+          m.type = MolType::VOL;
+        } else {
+          return false;
+        }
+    }
+  }
+  return true;
+}
+
+// flags signals the model is read and writable
+Qt::ItemFlags MolModel::flags(const QModelIndex& index) const {
+  Q_UNUSED(index);
+  return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled ;
 }
