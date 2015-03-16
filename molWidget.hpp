@@ -7,12 +7,37 @@
 #ifndef MOL_WIDGET_HPP
 #define MOL_WIDGET_HPP
 
+#include <QItemDelegate>
 #include <QWidget>
 
 #include "molModel.hpp"
 #include "ui_molWidget.h"
 
 
+// MolModelDelegate defines custom delegates for the MolModel view
+class MolModelDelegate : public QItemDelegate {
+
+    Q_OBJECT
+
+public:
+    MolModelDelegate(QWidget *parent = 0);
+
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const;
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+
+/*
+    void setModelData(QWidget *editor, QAbstractItemModel *model,
+                      const QModelIndex &index) const;
+
+    void updateEditorGeometry(QWidget *editor,
+        const QStyleOptionViewItem &option, const QModelIndex &index) const;
+*/
+};
+
+
+// MolWidget is the main widget for handling molecule data
 class MolWidget : public QWidget, Ui::MolWidget {
 
   Q_OBJECT
@@ -20,14 +45,16 @@ class MolWidget : public QWidget, Ui::MolWidget {
 public:
   MolWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
 
-
 private:
 
   MolModel model_;
+  MolModelDelegate delegate_;
 
 private slots:
   void printIt();
+  void deleteMols();
 };
+
 
 
 
