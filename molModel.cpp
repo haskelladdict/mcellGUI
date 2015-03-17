@@ -13,12 +13,9 @@
 MolModel::MolModel(QObject* parent) : QAbstractTableModel(parent) {
 
   // add some fake molecules
-  Molecule m1 = {"A", "1e-3", MolType::VOL};
-  Molecule m2 = {"B", "33e-6", MolType::SURF};
-  Molecule m3 = {"C", "1e-3", MolType::VOL};
-  molMap_[m1.name] = m1;
-  molMap_[m2.name] = m2;
-  molMap_[m3.name] = m3;
+  molMap_["A"] = {"1e-3", MolType::VOL};
+  molMap_["B"] = {"33e-6", MolType::SURF};
+  molMap_["C"] = {"1e-3", MolType::VOL};
   generateRowMapping_();
 }
 
@@ -51,10 +48,10 @@ QVariant MolModel::data(const QModelIndex& index, int role) const {
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     int row = index.row();
     QString molName = mols_[row];
-    const Molecule& mol = molMap_.at(molName);
+    const MolData& mol = molMap_.at(molName);
     switch (index.column()) {
       case 0:
-        return mol.name;
+        return molName;
       case 1:
         return mol.D;
       case 2:
@@ -73,7 +70,7 @@ QVariant MolModel::data(const QModelIndex& index, int role) const {
 bool MolModel::setData(const QModelIndex& index, const QVariant& value, int role) {
   if (role == Qt::EditRole) {
     QString molName = mols_[index.row()];
-    Molecule mol = molMap_[molName];
+    MolData mol = molMap_[molName];
     QString type;
     QString newName;
     QString D;
@@ -83,7 +80,6 @@ bool MolModel::setData(const QModelIndex& index, const QVariant& value, int role
         if (newName.isEmpty()) {
           return false;
         }
-        mol.name = newName;
         molMap_.erase(molName);
         molMap_[newName] = mol;
         break;
@@ -113,13 +109,6 @@ bool MolModel::setData(const QModelIndex& index, const QVariant& value, int role
 Qt::ItemFlags MolModel::flags(const QModelIndex& index) const {
   Q_UNUSED(index);
   return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled ;
-}
-
-
-// getMol returns a reference to the molecule in row
-const Molecule& MolModel::getMol(int row) const {
-  QString molName = mols_[row];
-  return molMap_.at(molName);
 }
 
 
