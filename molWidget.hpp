@@ -24,16 +24,7 @@ public:
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                           const QModelIndex &index) const;
-
     void setEditorData(QWidget *editor, const QModelIndex &index) const;
-
-/*
-    void setModelData(QWidget *editor, QAbstractItemModel *model,
-                      const QModelIndex &index) const;
-
-    void updateEditorGeometry(QWidget *editor,
-        const QStyleOptionViewItem &option, const QModelIndex &index) const;
-*/
 };
 
 
@@ -45,9 +36,11 @@ class MolWidget : public QWidget, Ui::MolWidget {
 public:
   MolWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
 
+  void initModel(MolModel* model);
+
 private:
 
-  MolModel model_;
+  MolModel* model_;
   MolModelDelegate delegate_;
 
 private slots:

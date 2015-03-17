@@ -5,19 +5,11 @@
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
 #include <algorithm>
-#include <iostream>
 
 #include "molModel.hpp"
 
 // constructor
-MolModel::MolModel(QObject* parent) : QAbstractTableModel(parent) {
-
-  // add some fake molecules
-  molMap_["A"] = {"1e-3", MolType::VOL};
-  molMap_["B"] = {"33e-6", MolType::SURF};
-  molMap_["C"] = {"1e-3", MolType::VOL};
-  generateRowMapping_();
-}
+MolModel::MolModel(QObject* parent) : QAbstractTableModel(parent) {}
 
 // rowCount returns the number of rows in the model
 int MolModel::rowCount(const QModelIndex& parent) const {

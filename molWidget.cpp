@@ -4,7 +4,6 @@
 //
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
-#include <iostream>
 #include <set>
 
 #include <QComboBox>
@@ -18,13 +17,19 @@ MolWidget::MolWidget(QWidget* parent, Qt::WindowFlags flags) :
   QWidget(parent, flags) {
 
   setupUi(this);
-  molTableView->setModel(&model_);
   molTableView->setItemDelegate(&delegate_);
   diffConstEntry->setValidator(new QDoubleValidator);
 
   connect(addMolButton, SIGNAL(clicked()), this, SLOT(addMol()));
   connect(clearMolButton, SIGNAL(clicked()), this, SLOT(clearSelection()));
   connect(deleteMolButton, SIGNAL(clicked()), this, SLOT(deleteMols()));
+}
+
+
+// initModel initializes the widget's underlying molecule model
+void MolWidget::initModel(MolModel* model) {
+  model_ = model;
+  molTableView->setModel(model);
 }
 
 
@@ -40,7 +45,7 @@ void MolWidget::deleteMols() {
     uniqueRows.insert(i.row());
   }
   for (auto& r : uniqueRows) {
-    model_.delMol(r);
+    model_->delMol(r);
   }
 }
 
@@ -54,7 +59,7 @@ void MolWidget::addMol() {
       tr("Please provide a valid molecule name"), QMessageBox::Close);
     return;
   }
-  if (model_.haveMol(molName)) {
+  if (model_->haveMol(molName)) {
     QString message = "The molecule name " + molName + " does already exists";
     QMessageBox::critical(this, "mcellGUI",
       tr(message.toLatin1().data()), QMessageBox::Close);
@@ -74,7 +79,7 @@ void MolWidget::addMol() {
   }
 
   MolData mol = {D, type};
-  model_.addMol(molName, std::move(mol));
+  model_->addMol(molName, std::move(mol));
 }
 
 

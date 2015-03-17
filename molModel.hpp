@@ -57,9 +57,4 @@ private:
   void generateRowMapping_();
 };
 
-
-
-
-
-
 #endif
