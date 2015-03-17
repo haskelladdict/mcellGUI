@@ -51,7 +51,8 @@ private:
   MolModelDelegate delegate_;
 
 private slots:
-  void printIt();
+  void addMol();
+  void clearSelection();
   void deleteMols();
 };
 

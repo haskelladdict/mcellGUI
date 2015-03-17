@@ -77,7 +77,7 @@ bool MolModel::setData(const QModelIndex& index, const QVariant& value, int role
     switch (index.column()) {
       case 0:
         newName = value.toString();
-        if (newName.isEmpty()) {
+        if (newName.isEmpty() || haveMol(newName)) {
           return false;
         }
         molMap_.erase(molName);
@@ -119,6 +119,21 @@ void MolModel::delMol(int rowID) {
   QModelIndex mod;
   QString molName = mols_[rowID];
   molMap_.erase(molName);
+  generateRowMapping_();
+}
+
+
+// haveMol returns true if a molecule with the provided name exists and false
+// otherwise
+bool MolModel::haveMol(const QString& molName) const {
+  return molMap_.find(molName) != molMap_.end();
+}
+
+
+// addMol adds a new molecule of the given data to the model
+// NOTE: addMol assumes that the molecule of name molName does not yet exist
+void MolModel::addMol(QString molName, MolData&& mol) {
+  molMap_[molName] = mol;
   generateRowMapping_();
 }
 

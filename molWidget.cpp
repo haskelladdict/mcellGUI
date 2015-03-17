@@ -8,6 +8,7 @@
 #include <set>
 
 #include <QComboBox>
+#include <QMessageBox>
 
 #include "molWidget.hpp"
 
@@ -21,7 +22,8 @@ MolWidget::MolWidget(QWidget* parent, Qt::WindowFlags flags) :
   molTableView->setItemDelegate(&delegate_);
   diffConstEntry->setValidator(new QDoubleValidator);
 
-  connect(addMolButton, SIGNAL(clicked()), this, SLOT(printIt()));
+  connect(addMolButton, SIGNAL(clicked()), this, SLOT(addMol()));
+  connect(clearMolButton, SIGNAL(clicked()), this, SLOT(clearSelection()));
   connect(deleteMolButton, SIGNAL(clicked()), this, SLOT(deleteMols()));
 }
 
@@ -43,9 +45,43 @@ void MolWidget::deleteMols() {
 }
 
 
-// printIt is a helper function for testing
-void MolWidget::printIt() {
-  std::cout << "pressed the button " << std::endl;
+// addMol adds the molecule defined in the define molecule grouper to the
+// model after checking that it is complete and valid
+void MolWidget::addMol() {
+  QString molName = molNameEntry->text();
+  if (molName.isEmpty()){
+    QMessageBox::critical(this, "mcellGUI",
+      tr("Please provide a valid molecule name"), QMessageBox::Close);
+    return;
+  }
+  if (model_.haveMol(molName)) {
+    QString message = "The molecule name " + molName + " does already exists";
+    QMessageBox::critical(this, "mcellGUI",
+      tr(message.toLatin1().data()), QMessageBox::Close);
+    return;
+  }
+
+  QString D = diffConstEntry->text();
+  if (D.isEmpty()){
+    QMessageBox::critical(this, "mcellGUI",
+      tr("Please provide a valid diffusion coefficient"), QMessageBox::Close);
+    return;
+  }
+
+  MolType type = MolType::VOL;
+  if (mol2DButton->isChecked()) {
+    type = MolType::SURF;
+  }
+
+  MolData mol = {D, type};
+  model_.addMol(molName, std::move(mol));
+}
+
+
+// clearSelection clears the current content of the define molecule widget
+void MolWidget::clearSelection() {
+  molNameEntry->clear();
+  diffConstEntry->clear();
 }
 
 

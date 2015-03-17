@@ -39,6 +39,8 @@ public:
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
   QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 
+  bool haveMol(const QString& molName) const;
+  void addMol(QString molName, MolData&& data);
   void delMol(int rowID);
 
   // write methods
