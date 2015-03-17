@@ -4,6 +4,7 @@
 //
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
+#include <algorithm>
 #include <iostream>
 
 #include "molModel.hpp"
@@ -15,9 +16,10 @@ MolModel::MolModel(QObject* parent) : QAbstractTableModel(parent) {
   Molecule m1 = {"A", "1e-3", MolType::VOL};
   Molecule m2 = {"B", "33e-6", MolType::SURF};
   Molecule m3 = {"C", "1e-3", MolType::VOL};
-  mols_.push_back(m1);
-  mols_.push_back(m2);
-  mols_.push_back(m3);
+  molMap_[m1.name] = m1;
+  molMap_[m2.name] = m2;
+  molMap_[m3.name] = m3;
+  generateRowMapping_();
 }
 
 // rowCount returns the number of rows in the model
@@ -47,14 +49,16 @@ QVariant MolModel::headerData(int section, Qt::Orientation orientation, int role
 // data returns the data contained at index
 QVariant MolModel::data(const QModelIndex& index, int role) const {
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
-    auto row = index.row();
+    int row = index.row();
+    QString molName = mols_[row];
+    const Molecule& mol = molMap_.at(molName);
     switch (index.column()) {
       case 0:
-        return mols_[row].name;
+        return mol.name;
       case 1:
-        return mols_[row].D;
+        return mol.D;
       case 2:
-        if (mols_[row].type == MolType::SURF) {
+        if (mol.type == MolType::SURF) {
           return QString("2D");
         } else {
           return QString("3D");
@@ -68,36 +72,40 @@ QVariant MolModel::data(const QModelIndex& index, int role) const {
 // setData enables editing of model properties via model views
 bool MolModel::setData(const QModelIndex& index, const QVariant& value, int role) {
   if (role == Qt::EditRole) {
-    Molecule& m = mols_[index.row()];
+    QString molName = mols_[index.row()];
+    Molecule mol = molMap_[molName];
     QString type;
-    QString name;
+    QString newName;
     QString D;
     switch (index.column()) {
       case 0:
-        name = value.toString();
-        if (name.isEmpty()) {
+        newName = value.toString();
+        if (newName.isEmpty()) {
           return false;
         }
-        m.name = name;
+        mol.name = newName;
+        molMap_.erase(molName);
+        molMap_[newName] = mol;
         break;
       case 1:
         D = value.toString();
         if (D.isEmpty()) {
           return false;
         }
-        m.D = D;
+        mol.D = D;
         break;
       case 2:
         type = value.toString();
         if (type == "2D") {
-          m.type = MolType::SURF;
+          mol.type = MolType::SURF;
         } else if (type == "3D") {
-          m.type = MolType::VOL;
+          mol.type = MolType::VOL;
         } else {
           return false;
         }
     }
   }
+  generateRowMapping_();
   return true;
 }
 
@@ -110,16 +118,32 @@ Qt::ItemFlags MolModel::flags(const QModelIndex& index) const {
 
 // getMol returns a reference to the molecule in row
 const Molecule& MolModel::getMol(int row) const {
-  return mols_[row];
+  QString molName = mols_[row];
+  return molMap_.at(molName);
 }
 
 
 // delMol deletes the molecule in the given row from the model
-// FIXME: calling beginRemoveRows with a temporary seems like a hack
+// NOTE: since generateRowMapping_ updates the model views it appears that
+// we don't need to call beginRemoveRows and endRemoveRows
 void MolModel::delMol(int rowID) {
   QModelIndex mod;
-  beginRemoveRows(mod, rowID, rowID);
-  auto it = mols_.begin() + rowID;
-  mols_.erase(it);
-  endRemoveRows();
+  QString molName = mols_[rowID];
+  molMap_.erase(molName);
+  generateRowMapping_();
 }
+
+
+// generateRowMapping creates the model's mapping of molecules to row indices
+// based on the molecule data stored in molMap_
+void MolModel::generateRowMapping_() {
+  mols_.clear();
+  beginResetModel();
+  for (auto& m : molMap_) {
+    mols_.push_back(m.first);
+  }
+  std::sort(mols_.begin(), mols_.end());
+  endResetModel();
+}
+
+

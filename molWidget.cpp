@@ -19,6 +19,7 @@ MolWidget::MolWidget(QWidget* parent, Qt::WindowFlags flags) :
   setupUi(this);
   molTableView->setModel(&model_);
   molTableView->setItemDelegate(&delegate_);
+  diffConstEntry->setValidator(new QDoubleValidator);
 
   connect(addMolButton, SIGNAL(clicked()), this, SLOT(printIt()));
   connect(deleteMolButton, SIGNAL(clicked()), this, SLOT(deleteMols()));
@@ -29,11 +30,16 @@ MolWidget::MolWidget(QWidget* parent, Qt::WindowFlags flags) :
 void MolWidget::deleteMols() {
   auto selModel = molTableView->selectionModel();
   auto selIDs = selModel->selectedIndexes();
-  if (selIDs.size() != 1) {
+  if (selIDs.size() == 0) {
     return;
   }
-  int rowID = selIDs[0].row();
-  model_.delMol(rowID);
+  std::set<int> uniqueRows;
+  for (auto& i : selIDs) {
+    uniqueRows.insert(i.row());
+  }
+  for (auto& r : uniqueRows) {
+    model_.delMol(r);
+  }
 }
 
 

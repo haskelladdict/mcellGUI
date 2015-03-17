@@ -8,6 +8,7 @@
 #define MOL_MODEL_HPP
 
 #include <vector>
+#include <map>
 
 #include <QString>
 
@@ -46,27 +47,14 @@ public:
   Qt::ItemFlags flags(const QModelIndex& index) const;
 
 private:
-  std::vector<Molecule> mols_;
+  // mols_ keeps track of the mapping row -> molecule name for the model view
+  // while molMap_ stores the actual model data
+  std::vector<QString> mols_;
+  std::map<QString,Molecule> molMap_;
   std::vector<QString> labels_ = {"molecule name", "D", "type"};
+
+  void generateRowMapping_();
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
