@@ -80,6 +80,7 @@ void MolWidget::addMol() {
 
   MolData mol = {D, type};
   model_->addMol(molName, std::move(mol));
+  clearSelection();
 }
 
 

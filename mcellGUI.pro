@@ -9,6 +9,6 @@ TARGET = mcellGUI
 INCLUDEPATH += .
 
 # Input
-HEADERS += mainWindow.hpp molModel.hpp molWidget.hpp
+HEADERS += io.hpp mainWindow.hpp molModel.hpp molWidget.hpp 
 FORMS += ui/mainWindow.ui ui/molWidget.ui
-SOURCES += mainWindow.cpp mcellGUI.cpp molModel.cpp molWidget.cpp
+SOURCES += io.cpp mainWindow.cpp mcellGUI.cpp molModel.cpp molWidget.cpp

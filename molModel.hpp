@@ -7,12 +7,12 @@
 #ifndef MOL_MODEL_HPP
 #define MOL_MODEL_HPP
 
-#include <vector>
 #include <map>
-
-#include <QString>
+#include <vector>
 
 #include <QAbstractTableModel>
+#include <QString>
+
 
 // MolType classifies 2D (SURF) or 3D (VOL) molecules
 enum class MolType {SURF, VOL};
@@ -22,6 +22,7 @@ struct MolData {
   QString D;
   MolType type;
 };
+using MolMap = std::map<QString,MolData>;
 
 
 // MolModel describes the QT MVC data model for molecules
@@ -40,18 +41,20 @@ public:
   QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 
   bool haveMol(const QString& molName) const;
-  void addMol(QString molName, MolData&& data);
-  void delMol(int rowID);
+  const MolMap& getMols() const;
 
   // write methods
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+  void addMol(QString molName, MolData&& data);
+  void delMol(int rowID);
   Qt::ItemFlags flags(const QModelIndex& index) const;
+
 
 private:
   // mols_ keeps track of the mapping row -> molecule name for the model view
   // while molMap_ stores the actual model data
   std::vector<QString> mols_;
-  std::map<QString,MolData> molMap_;
+  MolMap molMap_;
   std::vector<QString> labels_ = {"molecule name", "D", "type"};
 
   void generateRowMapping_();

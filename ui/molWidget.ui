@@ -29,7 +29,7 @@
      <item>
       <widget class="QPushButton" name="deleteMolButton">
        <property name="text">
-        <string>delete selected molecule</string>
+        <string>delete selected molecules</string>
        </property>
       </widget>
      </item>
@@ -128,5 +128,38 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>molNameEntry</sender>
+   <signal>returnPressed()</signal>
+   <receiver>addMolButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>135</x>
+     <y>439</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>63</x>
+     <y>513</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>diffConstEntry</sender>
+   <signal>returnPressed()</signal>
+   <receiver>addMolButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>238</x>
+     <y>475</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>121</x>
+     <y>502</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

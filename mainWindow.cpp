@@ -4,8 +4,9 @@
 //
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
-#include <iostream>
+#include <QFileDialog>
 
+#include "io.hpp"
 #include "mainWindow.hpp"
 
 // constructor
@@ -26,8 +27,14 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags flags) :
 }
 
 
-// exportMDL is responsible for exporting model MDL files based on the data model
+// exportMDL asks the user for the export path and then forwards path and model
+// info to the relevant io routine.
 void MainWindow::exportMDL_() {
-  std::cout << "exporting MDL file .... " << std::endl;
+  QString mdlFileName = QFileDialog::getSaveFileName(this, tr("Export MDL"),
+    QDir::homePath(), tr("MCell Model Files (*.mdl)"));
+  if (mdlFileName.isEmpty()) {
+    return;
+  }
+  writeMDL(mdlFileName, moleculeModel_.getMols());
 }
 

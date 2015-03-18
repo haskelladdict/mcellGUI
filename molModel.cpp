@@ -130,6 +130,15 @@ void MolModel::addMol(QString molName, MolData&& mol) {
 }
 
 
+// getMol returns a read only reference to the underlying molecule map.
+// NOTE: This could probably be encapsulated a bit better without exposing
+// the internals of how molecules are stored within the model. However,
+// returning a const MolMap& seems more efficient for the time being.
+const MolMap& MolModel::getMols() const {
+  return molMap_;
+}
+
+
 // generateRowMapping creates the model's mapping of molecules to row indices
 // based on the molecule data stored in molMap_
 void MolModel::generateRowMapping_() {
