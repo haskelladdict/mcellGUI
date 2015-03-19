@@ -39,6 +39,7 @@ public:
   // read methods
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
   QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+  Qt::ItemFlags flags(const QModelIndex& index) const;
 
   bool haveMol(const QString& molName) const;
   const MolMap& getMols() const;
@@ -47,7 +48,6 @@ public:
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
   void addMol(QString molName, MolData&& data);
   void delMol(int rowID);
-  Qt::ItemFlags flags(const QModelIndex& index) const;
 
 
 private:

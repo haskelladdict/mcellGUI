@@ -13,23 +13,33 @@ const QString TAB("  ");
 
 // writeMDL is responsible for writing model MDL files based on the data model.
 // This function returns true if it succeeds and false otherwise.
-bool writeMDL(QString fileName, const MolMap& molecules) {
+bool writeMDL(QString fileName, const MolMap& molecules,
+  const QStandardItemModel& paramModel) {
   QFile file(fileName);
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
     return false;
   }
+
   QTextStream out(&file);
-  if (!writeMolecules(out, molecules)) {
-    return false;
-  }
+  writeParams(out, paramModel);
+  writeMolecules(out, molecules);
 
   return true;
 }
 
 
-// writeMolecules writes the molecule info to the QTextStream. This function
-// returns true if it succeeds and false otherwise.
-bool writeMolecules(QTextStream& out, const MolMap& molecules) {
+// writeParams writes the model parameters to the QTextStream
+void writeParams(QTextStream& out, const QStandardItemModel& paramModel) {
+  for (int i = 0; i < paramModel.rowCount(); ++i) {
+    out << paramModel.item(i, 0)->text() << " = "
+        << paramModel.item(i, 1)->text() << "\n";
+  }
+  out << "\n";
+}
+
+
+// writeMolecules writes the molecule info to the QTextStream.
+void writeMolecules(QTextStream& out, const MolMap& molecules) {
 
   out << "DEFINE_MOLECULES {\n";
 
@@ -45,6 +55,5 @@ bool writeMolecules(QTextStream& out, const MolMap& molecules) {
     out << TAB << "}\n";
   }
   out << "}\n";
-  return true;
 }
 

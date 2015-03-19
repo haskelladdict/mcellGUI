@@ -18,51 +18,17 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="paramTab">
+      <widget class="ParamWidget" name="paramTab">
        <attribute name="title">
         <string>Parameters</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="spinBox"/>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Iterations</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>timestep</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>59</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
+      </widget>
+      <widget class="MolWidget" name="molTab">
+       <attribute name="title">
+        <string>Molecules</string>
+       </attribute>
       </widget>
       <widget class="QWidget" name="reactTab">
        <attribute name="title">
@@ -189,11 +155,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="MolWidget" name="molTab">
-       <attribute name="title">
-        <string>Molecules</string>
-       </attribute>
-      </widget>
      </widget>
     </item>
    </layout>
@@ -283,6 +244,12 @@
    <class>MolWidget</class>
    <extends>QWidget</extends>
    <header>molwidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ParamWidget</class>
+   <extends>QWidget</extends>
+   <header>paramWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

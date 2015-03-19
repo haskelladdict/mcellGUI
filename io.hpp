@@ -7,12 +7,16 @@
 #ifndef IO_HPP
 #define IO_HPP
 
+#include <QStandardItemModel>
+
 #include "molModel.hpp"
 
 class QTextStream;
 
-bool writeMDL(QString fileName, const MolMap& molecules);
+bool writeMDL(QString fileName, const MolMap& molecules,
+  const QStandardItemModel& paramModel);
 
-bool writeMolecules(QTextStream& out, const MolMap& molecules);
+void writeParams(QTextStream& out, const QStandardItemModel& paramModel);
+void writeMolecules(QTextStream& out, const MolMap& molecules);
 
 #endif

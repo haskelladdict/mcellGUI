@@ -7,10 +7,8 @@
 #ifndef MAIN_WINDOW_HPP
 #define MAIN_WINDOW_HPP
 
-//#include <memory>
-
 #include <QMainWindow>
-
+#include <QStandardItemModel>
 #include "ui_mainWindow.h"
 
 
@@ -26,7 +24,7 @@ private:
 
   // data models
   MolModel moleculeModel_;
-
+  QStandardItemModel paramModel_;
 
 private slots:
 
