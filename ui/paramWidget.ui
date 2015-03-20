@@ -93,6 +93,9 @@
          </item>
          <item row="1" column="1">
           <widget class="QComboBox" name="acc3DCombo">
+           <property name="currentText">
+            <string>TRUE</string>
+           </property>
            <item>
             <property name="text">
              <string>TRUE</string>

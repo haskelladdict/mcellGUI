@@ -8,26 +8,28 @@
 #define PARAM_WIDGET_HPP
 
 #include <QItemDelegate>
-#include <QStandardItemModel>
 #include <QWidget>
 
 #include "ui_paramWidget.h"
 
+class QStandardItemModel;
 
-/*
-// MolModelDelegate defines custom delegates for the MolModel view
-class MolModelDelegate : public QItemDelegate {
+// ParamModelDelegate defines a custom delegate between combo-boxes and the model
+class ParamModelDelegate : public QItemDelegate {
 
     Q_OBJECT
 
 public:
-    MolModelDelegate(QWidget *parent = 0);
+    ParamModelDelegate(QObject* parent = 0);
 
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
-                          const QModelIndex &index) const;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setEditorData(QWidget* editor, const QModelIndex &index) const;
+    void setModelData(QWidget* editor, QAbstractItemModel* model,
+      const QModelIndex & index ) const;
+
+private slots:
+    void onCurrentIndexChanged(int i);
 };
-*/
+
 
 // MolWidget is the main widget for handling molecule data
 class ParamWidget : public QWidget, Ui::ParamWidget {
@@ -38,14 +40,6 @@ public:
   ParamWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
 
   void setModel(QStandardItemModel* model);
-
-
-private:
-
-  QStandardItemModel* paramModel_;
-  //MolModelDelegate delegate_;
-
-private slots:
 };
 
 
