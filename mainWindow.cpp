@@ -8,7 +8,6 @@
 
 #include "io.hpp"
 #include "mainWindow.hpp"
-#include "paramModel.hpp"
 
 // constructor
 MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags flags) :
@@ -18,7 +17,8 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags flags) :
 
   // initialize and propagate models to view widgets
   molTab->initModel(&moleculeModel_);
-  paramTab->setModel(&paramModel_);
+  paramTab->initModel(&paramModel_);
+  noteWarnTab->initModel(&noteModel_, &warnModel_);
 
   // add some fake molecule data
   moleculeModel_.addMol(Molecule{"A", "1e-3", MolType::VOL});
@@ -38,6 +38,7 @@ void MainWindow::exportMDL_() {
   if (mdlFileName.isEmpty()) {
     return;
   }
-  writeMDL(mdlFileName, moleculeModel_.getMols(), paramModel_);
+  writeMDL(mdlFileName, moleculeModel_.getMols(), paramModel_, noteModel_,
+    warnModel_);
 }
 

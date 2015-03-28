@@ -9,6 +9,8 @@
 
 #include <QMainWindow>
 
+#include "molModel.hpp"
+#include "noteWarnModel.hpp"
 #include "paramModel.hpp"
 
 #include "ui_mainWindow.h"
@@ -27,6 +29,8 @@ private:
   // data models
   MolModel moleculeModel_;
   ParamModel paramModel_;
+  NotificationsModel noteModel_;
+  WarningsModel warnModel_;
 
 private slots:
 

@@ -23,12 +23,11 @@ ParamWidget::ParamWidget(QWidget* parent, Qt::WindowFlags flags) :
   setupUi(this);
   advancedGrouper->setHidden(true);
   timeStepEntry->setValidator(new QDoubleValidator);
-  //surfGridEdit->setValidator(new QIntValidator);
 }
 
 
-// setModel connects the widget elements to the underlying model
-void ParamWidget::setModel(ParamModel* paramModel) {
+// initModel connects the widget elements to the underlying model
+void ParamWidget::initModel(ParamModel* paramModel) {
 
   QDataWidgetMapper* iterMapper = new QDataWidgetMapper;
   iterMapper->setModel(paramModel);

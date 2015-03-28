@@ -39,7 +39,7 @@ class ParamWidget : public QWidget, Ui::ParamWidget {
 public:
   ParamWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
 
-  void setModel(ParamModel* model);
+  void initModel(ParamModel* model);
 };
 
 

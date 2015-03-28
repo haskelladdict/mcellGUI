@@ -10,13 +10,18 @@
 #include <QStandardItemModel>
 
 #include "molModel.hpp"
+#include "noteWarnModel.hpp"
+#include "paramModel.hpp"
 
 class QTextStream;
 
 bool writeMDL(QString fileName, const MolList& molecules,
-  const QStandardItemModel& paramModel);
+  const ParamModel& paramModel, const NotificationsModel& noteModel,
+  const WarningsModel& warnModel);
 
-void writeParams(QTextStream& out, const QStandardItemModel& paramModel);
+void writeParams(QTextStream& out, const ParamModel& paramModel);
+void writeNotifications(QTextStream& out, const NotificationsModel& noteModel);
+void writeWarnings(QTextStream& out, const WarningsModel& noteModel);
 void writeMolecules(QTextStream& out, const MolList& molecules);
 
 #endif

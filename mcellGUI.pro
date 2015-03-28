@@ -10,8 +10,9 @@ INCLUDEPATH += .
 
 # Input
 FORMS += ui/mainWindow.ui ui/molWidget.ui ui/paramWidget.ui \
-         ui/notifications.ui
+         ui/noteWarnWidget.ui
 HEADERS += io.hpp mainWindow.hpp molModel.hpp molWidget.hpp paramWidget.hpp \
-           paramModel.hpp
+           paramModel.hpp noteWarnWidget.hpp noteWarnModel.hpp
 SOURCES += io.cpp mainWindow.cpp mcellGUI.cpp molModel.cpp molWidget.cpp \
-           paramWidget.cpp paramModel.cpp
+           paramWidget.cpp paramModel.cpp noteWarnWidget.cpp \
+           noteWarnModel.cpp
