@@ -91,6 +91,8 @@ bool MolModel::setData(const QModelIndex& index, const QVariant& value, int role
       if (newName.isEmpty() || haveMol(newName)) {
         return false;
       }
+      molNames_.erase(m.name);
+      molNames_[newName] = 1;
       m.name = newName;
       break;
     case Col::D:
