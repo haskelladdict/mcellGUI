@@ -17,6 +17,7 @@ MolWidget::MolWidget(QWidget* parent, Qt::WindowFlags flags) :
   QWidget(parent, flags) {
 
   setupUi(this);
+  molTableView->setSortingEnabled(true);
   molTableView->setItemDelegate(&delegate_);
   diffConstEntry->setValidator(new QDoubleValidator);
 
@@ -29,7 +30,9 @@ MolWidget::MolWidget(QWidget* parent, Qt::WindowFlags flags) :
 // initModel initializes the widget's underlying molecule model
 void MolWidget::initModel(MolModel* model) {
   model_ = model;
-  molTableView->setModel(model);
+  auto proxyModel = new QSortFilterProxyModel(this);
+  proxyModel->setSourceModel(model);
+  molTableView->setModel(proxyModel);
 }
 
 
@@ -140,5 +143,9 @@ void MolModelDelegate::setEditorData(QWidget* editor,
       break;
   }
 }
+
+
+
+
 
 

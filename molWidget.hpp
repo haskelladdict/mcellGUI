@@ -8,6 +8,7 @@
 #define MOL_WIDGET_HPP
 
 #include <QItemDelegate>
+#include <QSortFilterProxyModel>
 #include <QWidget>
 
 #include "molModel.hpp"
