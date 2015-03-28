@@ -48,6 +48,9 @@ void writeParams(QTextStream& out, const ParamModel& paramModel) {
 void writeNotifications(QTextStream& out, const NotificationsModel& noteModel) {
   out << "NOTIFICATIONS {\n";
   for (int i = 0; i < noteModel.rowCount(); ++i) {
+    if (noteModel.item(i, 1)->text() == "UNSET") {
+      continue;
+    }
     out << noteModel.item(i, 0)->text() << " = "
         << noteModel.item(i, 1)->text() << "\n";
   }
@@ -58,6 +61,9 @@ void writeNotifications(QTextStream& out, const NotificationsModel& noteModel) {
 void writeWarnings(QTextStream& out, const WarningsModel& warnModel) {
   out << "WARNINGS {\n";
   for (int i = 0; i < warnModel.rowCount(); ++i) {
+    if (warnModel.item(i, 1)->text() == "UNSET") {
+      continue;
+    }
     out << warnModel.item(i, 0)->text() << " = "
         << warnModel.item(i, 1)->text() << "\n";
   }
