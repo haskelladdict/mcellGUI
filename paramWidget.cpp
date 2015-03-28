@@ -19,7 +19,6 @@ ParamWidget::ParamWidget(QWidget* parent, Qt::WindowFlags flags) :
   QWidget(parent, flags) {
 
   setupUi(this);
-  iterEntry->setValidator(new QIntValidator);
   timeStepEntry->setValidator(new QDoubleValidator);
   surfGridEdit->setValidator(new QIntValidator);
 }
