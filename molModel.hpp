@@ -16,6 +16,7 @@
 
 // MolType classifies 2D (SURF) or 3D (VOL) molecules
 enum class MolType {SURF, VOL};
+Q_DECLARE_METATYPE(MolType);
 
 // Molecule class stores the data for a single molecule
 struct Molecule {

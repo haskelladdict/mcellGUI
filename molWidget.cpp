@@ -107,11 +107,11 @@ QWidget* MolModelDelegate::createEditor(QWidget *parent,
   QLineEdit* edit;
   QComboBox* comb;
   switch (index.column()) {
-    case 0:
-    case 1:
+    case Col::Name:
+    case Col::D:
       edit = new QLineEdit(parent);
       return edit;
-    case 2:
+    case Col::Type:
       comb = new QComboBox(parent);
       comb->addItem("3D");
       comb->addItem("2D");
@@ -119,6 +119,7 @@ QWidget* MolModelDelegate::createEditor(QWidget *parent,
   }
   return nullptr;
 }
+
 
 // setEditorData reads the data and writes it to the editor
 void MolModelDelegate::setEditorData(QWidget* editor,
@@ -128,24 +129,52 @@ void MolModelDelegate::setEditorData(QWidget* editor,
   QLineEdit* edit;
   QComboBox* combo;
   switch (index.column()) {
-    case 0:
-      edit = static_cast<QLineEdit*>(editor);
+    case Col::Name:
+      edit = qobject_cast<QLineEdit*>(editor);
+      Q_ASSERT(edit);
       edit->setText(v.toString());
       break;
-    case 1:
-      edit = static_cast<QLineEdit*>(editor);
+    case Col::D:
+      edit = qobject_cast<QLineEdit*>(editor);
+      Q_ASSERT(edit);
       edit->setValidator(new QDoubleValidator);
       edit->setText(v.toString());
       break;
-    case 2:
-      combo = static_cast<QComboBox*>(editor);
+    case Col::Type:
+      combo = qobject_cast<QComboBox*>(editor);
+      Q_ASSERT(combo);
       combo->setCurrentText(v.toString());
+      break;
+    default:
+      QItemDelegate::setEditorData(editor, index);
       break;
   }
 }
 
 
+// setModelData writes the data to the model based on the editor setting
+void MolModelDelegate::setModelData(QWidget *editor, QAbstractItemModel* model,
+  const QModelIndex& index) const {
 
+  QLineEdit* edit;
+  QComboBox* combo;
+  switch (index.column()) {
+    case Col::Name:
+    case Col::D:
+      edit = qobject_cast<QLineEdit*>(editor);
+      Q_ASSERT(edit);
+      model->setData(index, edit->text());
+      break;
+    case Col::Type:
+      combo = qobject_cast<QComboBox*>(editor);
+      Q_ASSERT(edit);
+      model->setData(index, combo->currentText());
+      break;
+    default:
+      QItemDelegate::setModelData(editor, model, index);
+      break;
+  }
+}
 
 
 
