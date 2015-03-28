@@ -13,10 +13,10 @@
 
 class QTextStream;
 
-bool writeMDL(QString fileName, const MolMap& molecules,
+bool writeMDL(QString fileName, const MolList& molecules,
   const QStandardItemModel& paramModel);
 
 void writeParams(QTextStream& out, const QStandardItemModel& paramModel);
-void writeMolecules(QTextStream& out, const MolMap& molecules);
+void writeMolecules(QTextStream& out, const MolList& molecules);
 
 #endif

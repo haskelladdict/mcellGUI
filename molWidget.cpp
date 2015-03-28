@@ -78,8 +78,7 @@ void MolWidget::addMol() {
     type = MolType::SURF;
   }
 
-  MolData mol = {D, type};
-  model_->addMol(molName, std::move(mol));
+  model_->addMol(Molecule{molName, D, type});
   clearSelection();
 }
 

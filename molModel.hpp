@@ -11,19 +11,24 @@
 #include <vector>
 
 #include <QAbstractTableModel>
+#include <QList>
 #include <QString>
-
 
 // MolType classifies 2D (SURF) or 3D (VOL) molecules
 enum class MolType {SURF, VOL};
 
-// MolData is a simple storage class containing molecule properties
-struct MolData {
+// Molecule class stores the data for a single molecule
+struct Molecule {
+  QString name;
   QString D;
   MolType type;
 };
-using MolMap = std::map<QString,MolData>;
+using MolList = QList<Molecule>;
 
+// Col names column types (one per data element in Molecule)
+namespace Col {
+  enum col {Name, D, Type};
+}
 
 // MolModel describes the QT MVC data model for molecules
 class MolModel : public QAbstractTableModel {
@@ -42,22 +47,19 @@ public:
   Qt::ItemFlags flags(const QModelIndex& index) const;
 
   bool haveMol(const QString& molName) const;
-  const MolMap& getMols() const;
+  const MolList& getMols() const;
 
   // write methods
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
-  void addMol(QString molName, MolData&& data);
+  void addMol(const Molecule& data);
   void delMol(int rowID);
 
 
 private:
-  // mols_ keeps track of the mapping row -> molecule name for the model view
-  // while molMap_ stores the actual model data
-  std::vector<QString> mols_;
-  MolMap molMap_;
-  std::vector<QString> labels_ = {"molecule name", "D", "type"};
+  MolList mols_;
+  std::map<QString, int> molNames_;
 
-  void generateRowMapping_();
+  std::vector<QString> headerLabels_ = {"molecule name", "D", "type"};
 };
 
 #endif

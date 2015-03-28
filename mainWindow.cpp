@@ -23,9 +23,9 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags flags) :
   paramTab->setModel(&paramModel_);
 
   // add some fake molecule data
-  moleculeModel_.addMol("A", {"1e-3", MolType::VOL});
-  moleculeModel_.addMol("B", {"33e-6", MolType::SURF});
-  moleculeModel_.addMol("C", {"1e-3", MolType::VOL});
+  moleculeModel_.addMol(Molecule{"A", "1e-3", MolType::VOL});
+  moleculeModel_.addMol(Molecule{"B", "33e-6", MolType::SURF});
+  moleculeModel_.addMol(Molecule{"C", "1e-3", MolType::VOL});
 
   // signals and slots
   connect(exportMDLAction, SIGNAL(triggered(bool)), this, SLOT(exportMDL_()));
