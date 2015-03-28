@@ -10,20 +10,34 @@
 #include "paramModel.hpp"
 
 
-// init initializes a default model for mdl parameter keywords
-void paramModel::init(QStandardItemModel& model) {
+// constructor for ParamModel
+ParamModel::ParamModel(QObject* parent) :
+  QStandardItemModel(parent) {
 
-  QStringList keyWords;
-  keyWords << "ITERATIONS" << "TIME_STEP" << "SURFACE_GRID_DENSITY"
-    << "ACCURATE_3D_REACTIONS" << "CENTER_MOLECULES_ON_GRID"
-    << "MICROSCOPIC_REVERSIBILITY";
-
+  keyWords << "ITERATIONS" << "TIME_STEP";
   QStringList defaults;
-  defaults << "1" << "0.0" << "10000" << "TRUE" << "FALSE" << "OFF";
-
+  defaults << "0" << "0.0";
   for (int i=0; i < keyWords.size(); ++i) {
     QStandardItem *key = new QStandardItem(keyWords[i]);
     QStandardItem *val = new QStandardItem(defaults[i]);
-    model.appendRow(QList<QStandardItem*>{key, val});
+    appendRow(QList<QStandardItem*>{key, val});
   }
+
+  advKeyWords << "SURFACE_GRID_DENSITY" << "ACCURATE_3D_REACTIONS"
+    << "CENTER_MOLECULES_ON_GRID" << "MICROSCOPIC_REVERSIBILITY";
+  QStringList advDefaults;
+  advDefaults << "10000" << "TRUE" << "FALSE" << "OFF";
+  for (int i=0; i < advKeyWords.size(); ++i) {
+    QStandardItem *key = new QStandardItem(advKeyWords[i]);
+    QStandardItem *val = new QStandardItem(advDefaults[i]);
+    appendRow(QList<QStandardItem*>{key, val});
+  }
+
+  QStringList of;
+  of << "ON" << "OFF";
+
+  QStringList tf;
+  tf << "TRUE" << "FALSE";
+
+  values << QStringList("10000") << tf << tf << of;
 }

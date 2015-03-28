@@ -8,7 +8,9 @@
 #define MAIN_WINDOW_HPP
 
 #include <QMainWindow>
-#include <QStandardItemModel>
+
+#include "paramModel.hpp"
+
 #include "ui_mainWindow.h"
 
 
@@ -24,39 +26,11 @@ private:
 
   // data models
   MolModel moleculeModel_;
-  QStandardItemModel paramModel_;
+  ParamModel paramModel_;
 
 private slots:
 
   void exportMDL_();
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif

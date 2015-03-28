@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>421</width>
-    <height>596</height>
+    <width>424</width>
+    <height>448</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -57,6 +57,47 @@
     </layout>
    </item>
    <item>
+    <widget class="QCheckBox" name="checkBox">
+     <property name="text">
+      <string>Set Advanced Parameters</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>131</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="advancedGrouper">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="title">
+      <string>Advanced Parameters</string>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QGridLayout" name="paramGrid"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -64,412 +105,30 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>40</height>
+       <height>130</height>
       </size>
      </property>
     </spacer>
    </item>
-   <item>
-    <widget class="QToolBox" name="toolBox">
-     <widget class="QWidget" name="toolBoxPage1" native="true">
-      <attribute name="label">
-       <string>Advanced Options</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>SURFACE_GRID_DENSITY</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="surfGridEdit"/>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>ACCURATE_3D_REACTIONS</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="acc3DCombo">
-           <property name="currentText">
-            <string>TRUE</string>
-           </property>
-           <item>
-            <property name="text">
-             <string>TRUE</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>FALSE</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>CENTER_MOLECULES_ON_GRID</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="centerMolCombo">
-           <item>
-            <property name="text">
-             <string>TRUE</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>FALSE</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>MICROSCOPIC _REVERSIBILITY</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="microRevCombo">
-           <item>
-            <property name="text">
-             <string>ON</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>OFF</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>284</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="toolBoxPage2" native="true">
-      <attribute name="label">
-       <string>Notifications</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_18">
-         <property name="text">
-          <string>BOX_TRIANGULATION_REPORT</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="comboBox_11">
-         <item>
-          <property name="text">
-           <string>OFF</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>ON</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>DIFFUSION_CONSTANT_REPORT</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QComboBox" name="comboBox">
-         <item>
-          <property name="text">
-           <string>ON</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>OFF</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>PROBABILITY_REPORT</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QComboBox" name="comboBox_2">
-         <item>
-          <property name="text">
-           <string>BRIEF</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>ON</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>FILE_OUTPUT_REPORT</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QComboBox" name="comboBox_3">
-         <item>
-          <property name="text">
-           <string>OFF</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>ON</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_10">
-         <property name="text">
-          <string>FINAL_SUMMARY</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QComboBox" name="comboBox_4">
-         <item>
-          <property name="text">
-           <string>ON</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>OFF</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_11">
-         <property name="text">
-          <string>ITERATION_REPORT</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QComboBox" name="comboBox_5">
-         <item>
-          <property name="text">
-           <string>ON</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>OFF</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_12">
-         <property name="text">
-          <string>PARTITION_LOCATION_REPORT</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QComboBox" name="comboBox_6">
-         <item>
-          <property name="text">
-           <string>OFF</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>ON</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="label_19">
-         <property name="text">
-          <string>PROBABILITY_REPORT</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <widget class="QComboBox" name="comboBox_12">
-         <item>
-          <property name="text">
-           <string>ON</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>OFF</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="label_20">
-         <property name="text">
-          <string>PROBABILITY_THESHOLD</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="QLineEdit" name="lineEdit"/>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="label_13">
-         <property name="text">
-          <string>VARYING_PROBABILITY_REPORT</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="1">
-        <widget class="QComboBox" name="comboBox_7">
-         <item>
-          <property name="text">
-           <string>ON</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>OFF</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="10" column="0">
-        <widget class="QLabel" name="label_14">
-         <property name="text">
-          <string>PROGRESS_REPORT</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="1">
-        <widget class="QComboBox" name="comboBox_8">
-         <item>
-          <property name="text">
-           <string>ON</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>OFF</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="11" column="0">
-        <widget class="QLabel" name="label_16">
-         <property name="text">
-          <string>RELEASE_EVENT_REPORT</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="1">
-        <widget class="QComboBox" name="comboBox_9">
-         <item>
-          <property name="text">
-           <string>ON</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>OFF</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="12" column="0">
-        <widget class="QLabel" name="label_17">
-         <property name="text">
-          <string>MOLECULE_COLLISION_REPORT</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="1">
-        <widget class="QComboBox" name="comboBox_10">
-         <item>
-          <property name="text">
-           <string>OFF</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>ON</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="13" column="0">
-        <widget class="QLabel" name="label_21">
-         <property name="text">
-          <string>ALL_NOTIFICATIONS</string>
-         </property>
-        </widget>
-       </item>
-       <item row="13" column="1">
-        <widget class="QComboBox" name="comboBox_13">
-         <item>
-          <property name="text">
-           <string>OFF</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>ON</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="toolBoxPage3" native="true">
-      <attribute name="label">
-       <string>Errors</string>
-      </attribute>
-     </widget>
-    </widget>
-   </item>
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>checkBox</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>advancedGrouper</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>128</x>
+     <y>173</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>128</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -12,15 +12,15 @@
 
 #include "ui_paramWidget.h"
 
-class QStandardItemModel;
+class ParamModel;
 
 // ParamModelDelegate defines a custom delegate between combo-boxes and the model
-class ParamModelDelegate : public QItemDelegate {
+class ComboBoxModelDelegate : public QItemDelegate {
 
     Q_OBJECT
 
 public:
-    ParamModelDelegate(QObject* parent = 0);
+    ComboBoxModelDelegate(QObject* parent = 0);
 
     void setEditorData(QWidget* editor, const QModelIndex &index) const;
     void setModelData(QWidget* editor, QAbstractItemModel* model,
@@ -39,7 +39,7 @@ class ParamWidget : public QWidget, Ui::ParamWidget {
 public:
   ParamWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
 
-  void setModel(QStandardItemModel* model);
+  void setModel(ParamModel* model);
 };
 
 

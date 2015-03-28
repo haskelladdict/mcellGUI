@@ -6,11 +6,13 @@
 
 #include <QDebug>
 
+#include <QComboBox>
 #include <QDataWidgetMapper>
 #include <QMetaProperty>
 #include <QStringListModel>
 #include <QStandardItemModel>
 
+#include "paramModel.hpp"
 #include "paramWidget.hpp"
 
 
@@ -19,13 +21,14 @@ ParamWidget::ParamWidget(QWidget* parent, Qt::WindowFlags flags) :
   QWidget(parent, flags) {
 
   setupUi(this);
+  advancedGrouper->setHidden(true);
   timeStepEntry->setValidator(new QDoubleValidator);
-  surfGridEdit->setValidator(new QIntValidator);
+  //surfGridEdit->setValidator(new QIntValidator);
 }
 
 
 // setModel connects the widget elements to the underlying model
-void ParamWidget::setModel(QStandardItemModel* paramModel) {
+void ParamWidget::setModel(ParamModel* paramModel) {
 
   QDataWidgetMapper* iterMapper = new QDataWidgetMapper;
   iterMapper->setModel(paramModel);
@@ -37,47 +40,43 @@ void ParamWidget::setModel(QStandardItemModel* paramModel) {
   dtMapper->addMapping(timeStepEntry, 1);
   dtMapper->setCurrentIndex(1);
 
-  QDataWidgetMapper* surfGridMapper = new QDataWidgetMapper;
-  surfGridMapper->setModel(paramModel);
-  surfGridMapper->addMapping(surfGridEdit, 1);
-  surfGridMapper->setCurrentIndex(2);
+  auto keys = paramModel->advKeyWords;
+  auto vals = paramModel->values;
+  int id = 2;
+  for (int i=0; i<keys.size(); ++i) {
 
-  QDataWidgetMapper* acc3DMapper = new QDataWidgetMapper;
-  acc3DMapper->setModel(paramModel);
-  auto acc3DDel = new ParamModelDelegate(this);
-  acc3DMapper->setItemDelegate(acc3DDel);
-  acc3DMapper->addMapping(acc3DCombo, 1);
-  acc3DMapper->setCurrentIndex(3);
-  connect(acc3DCombo, SIGNAL(currentIndexChanged(int)), acc3DDel,
-    SLOT(onCurrentIndexChanged(int)));
+    QDataWidgetMapper* mapper = new QDataWidgetMapper;
+    mapper->setModel(paramModel);
+    paramGrid->addWidget(new QLabel(keys[i]), i, 0);
 
-  QDataWidgetMapper* centerMolMapper = new QDataWidgetMapper;
-  centerMolMapper->setModel(paramModel);
-  auto centerMolDel = new ParamModelDelegate(this);
-  centerMolMapper->setItemDelegate(centerMolDel);
-  centerMolMapper->addMapping(centerMolCombo, 1);
-  centerMolMapper->setCurrentIndex(4);
-  connect(centerMolCombo, SIGNAL(currentIndexChanged(int)), centerMolDel,
-    SLOT(onCurrentIndexChanged(int)));
+    if (keys[i] == "SURFACE_GRID_DENSITY") {
+      auto l = new QLineEdit(vals[i][0], this);
+      l->setValidator(new QIntValidator);
+      paramGrid->addWidget(l, i, 1);
+      mapper->addMapping(l, 1);
+    } else {
+      auto c = new QComboBox(this);
+      c->insertItems(0,vals[i]);
+      paramGrid->addWidget(c, i, 1);
 
-  QDataWidgetMapper* microRevMapper = new QDataWidgetMapper;
-  microRevMapper->setModel(paramModel);
-  auto microRevDel = new ParamModelDelegate(this);
-  microRevMapper->setItemDelegate(microRevDel);
-  microRevMapper->addMapping(microRevCombo, 1);
-  microRevMapper->setCurrentIndex(5);
-  connect(microRevCombo, SIGNAL(currentIndexChanged(int)), microRevDel,
-    SLOT(onCurrentIndexChanged(int)));
+      auto del = new ComboBoxModelDelegate(this);
+      mapper->setItemDelegate(del);
+      mapper->addMapping(c, 1);
+      connect(c, SIGNAL(currentIndexChanged(int)), del,
+        SLOT(onCurrentIndexChanged(int)));
+    }
+    mapper->setCurrentIndex(id++);
+  }
 }
 
 
-// ParamModelDelegate constructor
-ParamModelDelegate::ParamModelDelegate(QObject *parent) :
+// ComboBoxModelDelegate constructor
+ComboBoxModelDelegate::ComboBoxModelDelegate(QObject *parent) :
   QItemDelegate(parent) {}
 
 
 // setEditorData reads the data and writes it to the editor
-void ParamModelDelegate::setEditorData(QWidget* editor,
+void ComboBoxModelDelegate::setEditorData(QWidget* editor,
   const QModelIndex& index) const {
   if (!editor->metaObject()->userProperty().isValid()) {
     if (editor->property("currentText").isValid()) {
@@ -89,7 +88,7 @@ void ParamModelDelegate::setEditorData(QWidget* editor,
 }
 
 // setModelData writes the data contained in the editor to the model
-void ParamModelDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
+void ComboBoxModelDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
   const QModelIndex& index ) const {
   if (!editor->metaObject()->userProperty().isValid()) {
     QVariant value = editor->property("currentText");
@@ -104,7 +103,7 @@ void ParamModelDelegate::setModelData(QWidget* editor, QAbstractItemModel* model
 
 // onCurrentIndexChanged triggers a commitData signal if the sender was
 // a combo-box
-void ParamModelDelegate::onCurrentIndexChanged(int i) {
+void ComboBoxModelDelegate::onCurrentIndexChanged(int i) {
   Q_UNUSED(i);
   QComboBox* cb = static_cast<QComboBox*>(sender());
   if(cb) {

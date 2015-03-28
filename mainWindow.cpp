@@ -18,8 +18,6 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags flags) :
 
   // initialize and propagate models to view widgets
   molTab->initModel(&moleculeModel_);
-
-  paramModel::init(paramModel_);
   paramTab->setModel(&paramModel_);
 
   // add some fake molecule data

@@ -8,12 +8,20 @@
 #define PARAM_MODEL_HPP
 
 #include <QStandardItemModel>
+#include <QStringList>
 
+class ParamModel : public QStandardItemModel {
 
-namespace paramModel {
+public:
 
-void init(QStandardItemModel& model);
+  ParamModel(QObject* parent = 0);
 
-}
+  // list of main keywords
+  QStringList keyWords;
+
+  // list of advanced keywords and their possible values
+  QStringList advKeyWords;
+  QList<QStringList> values;
+};
 
 #endif
