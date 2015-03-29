@@ -13,7 +13,7 @@ FORMS += ui/mainWindow.ui ui/molWidget.ui ui/paramWidget.ui \
          ui/noteWarnWidget.ui ui/reactionWidget.ui
 HEADERS += io.hpp mainWindow.hpp molModel.hpp molWidget.hpp paramWidget.hpp \
            paramModel.hpp noteWarnWidget.hpp noteWarnModel.hpp \
-           reactionWidget.hpp
+           reactionWidget.hpp reactionModel.hpp
 SOURCES += io.cpp mainWindow.cpp mcellGUI.cpp molModel.cpp molWidget.cpp \
            paramWidget.cpp paramModel.cpp noteWarnWidget.cpp \
-           noteWarnModel.cpp reactionWidget.cpp
+           noteWarnModel.cpp reactionWidget.cpp reactionModel.cpp

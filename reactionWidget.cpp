@@ -28,15 +28,14 @@ ReactionWidget::ReactionWidget(QWidget* parent, Qt::WindowFlags flags) :
   connect(delShortCut, SIGNAL(activated()), this, SLOT(deleteReactions()));
 }
 
-/*
+
 // initModel initializes the widget's underlying molecule model
-void MolWidget::initModel(MolModel* model) {
+void ReactionWidget::initModel(ReactionModel* model) {
   model_ = model;
   auto proxyModel = new QSortFilterProxyModel(this);
   proxyModel->setSourceModel(model);
-  molTableView->setModel(proxyModel);
+  reactTableView->setModel(proxyModel);
 }
-*/
 
 // deleteReactions deletes all currently selected molecules from the model
 void ReactionWidget::deleteReactions() {

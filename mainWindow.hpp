@@ -12,6 +12,7 @@
 #include "molModel.hpp"
 #include "noteWarnModel.hpp"
 #include "paramModel.hpp"
+#include "reactionModel.hpp"
 
 #include "ui_mainWindow.h"
 
@@ -31,6 +32,7 @@ private:
   ParamModel paramModel_;
   NotificationsModel noteModel_;
   WarningsModel warnModel_;
+  ReactionModel reactModel_;
 
 private slots:
 

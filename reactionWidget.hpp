@@ -11,7 +11,7 @@
 #include <QSortFilterProxyModel>
 #include <QWidget>
 
-//#include "molModel.hpp"
+#include "reactionModel.hpp"
 #include "ui_reactionWidget.h"
 
 #if 0
@@ -39,13 +39,13 @@ class ReactionWidget : public QWidget, Ui::ReactionWidget {
 public:
   ReactionWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
 
-//  void initModel(ReactionModel* model);
+  void initModel(ReactionModel* model);
 
 private:
 
   int reactCount_ = 0;
-//  MolModel* model_;
-//  MolModelDelegate delegate_;
+  ReactionModel* model_;
+//  ReactModelDelegate delegate_;
 
 private slots:
   void addReaction();
