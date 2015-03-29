@@ -17,10 +17,13 @@ public:
   ParamModel(QObject* parent = 0);
 
   // list of main keywords
-  QStringList keyWords;
+  const QStringList keyWords = QStringList({"ITERATIONS", "TIME_STEP"});
 
   // list of advanced keywords and their possible values
-  QStringList advKeyWords;
+  const QStringList advKeyWords = QStringList({"TIME_STEP_MAX", "SPACE_STEP",
+    "SURFACE_GRID_DENSITY", "INTERACTION_RADIUS", "ACCURATE_3D_REACTIONS",
+    "CENTER_MOLECULES_ON_GRID", "VACANCY_SEARCH_DISTANCE",
+    "MICROSCOPIC_REVERSIBILITY"});
   QList<QStringList> values;
 };
 

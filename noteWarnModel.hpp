@@ -19,7 +19,12 @@ public:
   NotificationsModel(QObject* parent = 0);
 
   // list of keywords and their possible values
-  QStringList noteKeyWords;
+  const QStringList noteKeyWords = QStringList({"BOX_TRIANGULATION_REPORT",
+    "DIFFUSION_CONSTANT_REPORT", "FILE_OUTPUT_REPORT", "FINAL_SUMMARY",
+    "ITERATION_REPORT", "PARTITION_LOCATION_REPORT", "PROBABILITY_REPORT",
+    "PROBABILITY_REPORT_THRESHOLD", "VARYING_PROBABILITY_REPORT",
+    "PROGRESS_REPORT", "RELEASE_EVENT_REPORT", "MOLECULE_COLLISION_REPORT",
+    "ALL_NOTIFICATIONS"});
   QList<QStringList> noteValues;
 };
 
@@ -32,7 +37,12 @@ public:
   WarningsModel(QObject* parent = 0);
 
   // list of keywords and their possible values
-  QStringList warnKeyWords;
+  const QStringList warnKeyWords = QStringList({"DEGENERATE_POLYGONS",
+    "HIGH_REACTION_PROBABILITY", "HIGH_PROBABILITY_THRESHOLD",
+    "LIFETIME_TOO_SHORT", "LIFETIME_THRESHOLD", "MISSED_REACTIONS",
+     "MISSED_REACTION_THRESHOLD", "NEGATIVE_DIFFUSION_CONSTANT",
+     "MISSING_SURFACE_ORIENTATION", "NEGATIVE_REACTION_RATE",
+     "USELESS_VOLUME_ORIENTATION", "ALL_WARNINGS"});
   QList<QStringList> warnValues;
 };
 

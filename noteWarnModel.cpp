@@ -11,23 +11,12 @@
 NotificationsModel::NotificationsModel(QObject* parent) :
   QStandardItemModel(parent) {
 
-  noteKeyWords << "BOX_TRIANGULATION_REPORT" << "DIFFUSION_CONSTANT_REPORT"
-    << "FILE_OUTPUT_REPORT" << "FINAL_SUMMARY" << "ITERATION_REPORT"
-    << "PARTITION_LOCATION_REPORT" << "PROBABILITY_REPORT"
-    << "PROBABILITY_REPORT_THRESHOLD" << "VARYING_PROBABILITY_REPORT"
-    << "PROGRESS_REPORT" << "RELEASE_EVENT_REPORT"
-    << "MOLECULE_COLLISION_REPORT" << "ALL_NOTIFICATIONS";
-
-  QStringList of;
-  of << "ON" << "OFF";
-
+  QStringList of({"ON", "OFF"});
   QStringList ofAll(of);
   ofAll << "UNSET";
+  QStringList ob({"ON", "BRIEF"});
 
-  QStringList ob;
-  ob << "ON" << "BRIEF";
-
-  noteValues << of << ob << of << of << of << of << of << QStringList("1")
+  noteValues << of << ob << of << of << of << of << of << QStringList("")
     << of << of << of << of << ofAll;
 
   QStringList noteDefaults;
@@ -46,20 +35,13 @@ NotificationsModel::NotificationsModel(QObject* parent) :
 WarningsModel::WarningsModel(QObject* parent) :
   QStandardItemModel(parent) {
 
-  warnKeyWords << "DEGENERATE_POLYGONS" << "HIGH_REACTION_PROBABILITY"
-    << "HIGH_PROBABILITY_THRESHOLD" << "LIFETIME_TOO_SHORT"
-    << "LIFETIME_THRESHOLD" << "MISSED_REACTIONS" << "MISSED_REACTION_THRESHOLD"
-    << "NEGATIVE_DIFFUSION_CONSTANT" << "MISSING_SURFACE_ORIENTATION"
-    << "NEGATIVE_REACTION_RATE" << "USELESS_VOLUME_ORIENTATION"
-    << "ALL_WARNINGS";
-
-  QStringList warn;
-  warn << "IGNORED" << "WARNING" << "ERROR";
+  QStringList warn({"IGNORED", "WARNING", "ERROR"});
   QStringList warnAll(warn);
   warnAll << "UNSET";
+  QStringList empty("");
 
-  warnValues << warn << warn << QStringList("1.0") << warn << QStringList("50")
-    << warn << QStringList("1e-3") << warn << warn << warn << warn << warnAll;
+  warnValues << warn << warn << empty << warn << empty << warn << empty
+    << warn << warn << warn << warn << warnAll;
 
   QStringList warnDefaults;
   warnDefaults << "WARNING" << "IGNORED" << "1.0" << "WARNING" << "50"

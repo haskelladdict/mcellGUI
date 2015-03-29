@@ -14,7 +14,6 @@
 ParamModel::ParamModel(QObject* parent) :
   QStandardItemModel(parent) {
 
-  keyWords << "ITERATIONS" << "TIME_STEP";
   QStringList defaults;
   defaults << "0" << "0.0";
   for (int i=0; i < keyWords.size(); ++i) {
@@ -23,10 +22,11 @@ ParamModel::ParamModel(QObject* parent) :
     appendRow(QList<QStandardItem*>{key, val});
   }
 
-  advKeyWords << "TIME_STEP_MAX" << "SPACE_STEP"
-    << "SURFACE_GRID_DENSITY" << "INTERACTION_RADIUS"
-    << "ACCURATE_3D_REACTIONS" << "CENTER_MOLECULES_ON_GRID"
-    << "VACANCY_SEARCH_DISTANCE" << "MICROSCOPIC_REVERSIBILITY";
+  QStringList of({"ON", "OFF"});
+  QStringList tf({"TRUE", "FALSE"});
+  QStringList empty("");
+  values << empty << empty << empty << empty << tf << tf << empty << of;
+
   QStringList advDefaults;
   advDefaults << "" << "" << "10000" << "" << "TRUE" << "FALSE" << "0.1" << "OFF";
   for (int i=0; i < advKeyWords.size(); ++i) {
@@ -35,14 +35,4 @@ ParamModel::ParamModel(QObject* parent) :
     appendRow(QList<QStandardItem*>{key, val});
   }
 
-  QStringList of;
-  of << "ON" << "OFF";
-
-  QStringList tf;
-  tf << "TRUE" << "FALSE";
-
-  QStringList empty("");
-
-  values << empty << empty << QStringList("10000") << empty << tf << tf
-    << QStringList("0.1") << of;
 }
