@@ -23,10 +23,12 @@ ParamModel::ParamModel(QObject* parent) :
     appendRow(QList<QStandardItem*>{key, val});
   }
 
-  advKeyWords << "SURFACE_GRID_DENSITY" << "ACCURATE_3D_REACTIONS"
-    << "CENTER_MOLECULES_ON_GRID" << "MICROSCOPIC_REVERSIBILITY";
+  advKeyWords << "TIME_STEP_MAX" << "SPACE_STEP"
+    << "SURFACE_GRID_DENSITY" << "INTERACTION_RADIUS"
+    << "ACCURATE_3D_REACTIONS" << "CENTER_MOLECULES_ON_GRID"
+    << "VACANCY_SEARCH_DISTANCE" << "MICROSCOPIC_REVERSIBILITY";
   QStringList advDefaults;
-  advDefaults << "10000" << "TRUE" << "FALSE" << "OFF";
+  advDefaults << "" << "" << "10000" << "" << "TRUE" << "FALSE" << "0.1" << "OFF";
   for (int i=0; i < advKeyWords.size(); ++i) {
     QStandardItem *key = new QStandardItem(advKeyWords[i]);
     QStandardItem *val = new QStandardItem(advDefaults[i]);
@@ -39,5 +41,8 @@ ParamModel::ParamModel(QObject* parent) :
   QStringList tf;
   tf << "TRUE" << "FALSE";
 
-  values << QStringList("10000") << tf << tf << of;
+  QStringList empty("");
+
+  values << empty << empty << QStringList("10000") << empty << tf << tf
+    << QStringList("0.1") << of;
 }

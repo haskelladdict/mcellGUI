@@ -4,11 +4,10 @@
 //
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
-#include <QDebug>
-
 #include <QComboBox>
 #include <QDataWidgetMapper>
 #include <QMetaProperty>
+#include <QPushButton>
 #include <QStringListModel>
 #include <QStandardItemModel>
 
@@ -47,10 +46,17 @@ void ParamWidget::initModel(ParamModel* paramModel) {
     QDataWidgetMapper* mapper = new QDataWidgetMapper;
     mapper->setModel(paramModel);
     paramGrid->addWidget(new QLabel(keys[i]), i, 0);
-
-    if (keys[i] == "SURFACE_GRID_DENSITY") {
+    if (keys[i] == "SURFACE_GRID_DENSITY" ||
+        keys[i] == "TIME_STEP_MAX" ||
+        keys[i] == "SPACE_STEP" ||
+        keys[i] == "INTERACTION_RADIUS" ||
+        keys[i] == "VACANCY_SEARCH_DISTANCE") {
       auto l = new QLineEdit(vals[i][0], this);
-      l->setValidator(new QIntValidator);
+      if (keys[i] == "SURFACE_GRID_DENSITY") {
+        l->setValidator(new QRegExpValidator(intOrEmptyRegex_));
+      } else {
+        l->setValidator(new QRegExpValidator(doubleOrEmptyRegex_));
+      }
       paramGrid->addWidget(l, i, 1);
       mapper->addMapping(l, 1);
     } else {

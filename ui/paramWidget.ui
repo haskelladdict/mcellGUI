@@ -59,7 +59,7 @@
    <item>
     <widget class="QCheckBox" name="checkBox">
      <property name="text">
-      <string>Set Advanced Parameters</string>
+      <string>Show Advanced Parameters</string>
      </property>
     </widget>
    </item>

@@ -12,6 +12,8 @@
 
 #include "ui_paramWidget.h"
 
+
+
 class ParamModel;
 
 // ParamModelDelegate defines a custom delegate between combo-boxes and the model
@@ -40,6 +42,10 @@ public:
   ParamWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
 
   void initModel(ParamModel* model);
+
+private:
+  QRegExp doubleOrEmptyRegex_ = QRegExp("([-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)?");
+  QRegExp intOrEmptyRegex_ = QRegExp("([0-9]+)?");
 };
 
 

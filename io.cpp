@@ -37,6 +37,9 @@ bool writeMDL(QString fileName, const MolList& molecules,
 // writeParams writes the model parameters to the QTextStream
 void writeParams(QTextStream& out, const ParamModel& paramModel) {
   for (int i = 0; i < paramModel.rowCount(); ++i) {
+    if (paramModel.item(i, 1)->text() == "") {
+      continue;
+    }
     out << paramModel.item(i, 0)->text() << " = "
         << paramModel.item(i, 1)->text() << "\n";
   }
