@@ -7,7 +7,9 @@
 #include <set>
 
 #include <QComboBox>
+#include <QLineEdit>
 #include <QMessageBox>
+#include <QShortcut>
 
 #include "molWidget.hpp"
 
@@ -19,11 +21,15 @@ MolWidget::MolWidget(QWidget* parent, Qt::WindowFlags flags) :
   setupUi(this);
   molTableView->setSortingEnabled(true);
   molTableView->setItemDelegate(&delegate_);
-  diffConstEntry->setValidator(new QDoubleValidator);
 
   connect(addMolButton, SIGNAL(clicked()), this, SLOT(addMol()));
-  connect(clearMolButton, SIGNAL(clicked()), this, SLOT(clearSelection()));
   connect(deleteMolButton, SIGNAL(clicked()), this, SLOT(deleteMols()));
+
+  // add shortcuts for adding and deleting
+  QShortcut *addShortCut = new QShortcut(QKeySequence("Ctrl+A"), this);
+  connect(addShortCut, SIGNAL(activated()), this, SLOT(addMol()));
+  QShortcut *delShortCut = new QShortcut(QKeySequence("Ctrl+X"), this);
+  connect(delShortCut, SIGNAL(activated()), this, SLOT(deleteMols()));
 }
 
 
@@ -56,42 +62,11 @@ void MolWidget::deleteMols() {
 // addMol adds the molecule defined in the define molecule grouper to the
 // model after checking that it is complete and valid
 void MolWidget::addMol() {
-  QString molName = molNameEntry->text();
-  if (molName.isEmpty()){
-    QMessageBox::critical(this, "mcellGUI",
-      tr("Please provide a valid molecule name"), QMessageBox::Close);
-    return;
-  }
-  if (model_->haveMol(molName)) {
-    QString message = "The molecule name " + molName + " does already exists";
-    QMessageBox::critical(this, "mcellGUI",
-      tr(message.toLatin1().data()), QMessageBox::Close);
-    return;
-  }
-
-  QString D = diffConstEntry->text();
-  if (D.isEmpty()){
-    QMessageBox::critical(this, "mcellGUI",
-      tr("Please provide a valid diffusion coefficient"), QMessageBox::Close);
-    return;
-  }
-
-  MolType type = MolType::VOL;
-  if (mol2DButton->isChecked()) {
-    type = MolType::SURF;
-  }
-
-  model_->addMol(Molecule{molName, D, type});
-  clearSelection();
+  // construct a default molecule
+  QString id;
+  QString molName = "newMol_" + id.setNum(molCount_++);
+  model_->addMol(Molecule{molName, "0.0", MolType::VOL});
 }
-
-
-// clearSelection clears the current content of the define molecule widget
-void MolWidget::clearSelection() {
-  molNameEntry->clear();
-  diffConstEntry->clear();
-}
-
 
 // MolModelDelegate constructor
 MolModelDelegate::MolModelDelegate(QWidget *parent) :

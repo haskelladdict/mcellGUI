@@ -43,12 +43,12 @@ public:
 
 private:
 
+  int molCount_ = 0;
   MolModel* model_;
   MolModelDelegate delegate_;
 
 private slots:
   void addMol();
-  void clearSelection();
   void deleteMols();
 };
 
