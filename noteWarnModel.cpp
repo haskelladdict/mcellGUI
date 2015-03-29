@@ -11,6 +11,13 @@
 NotificationsModel::NotificationsModel(QObject* parent) :
   QStandardItemModel(parent) {
 
+  noteKeyWords << "BOX_TRIANGULATION_REPORT" << "DIFFUSION_CONSTANT_REPORT"
+    << "FILE_OUTPUT_REPORT" << "FINAL_SUMMARY" << "ITERATION_REPORT"
+    << "PARTITION_LOCATION_REPORT" << "PROBABILITY_REPORT"
+    << "PROBABILITY_REPORT_THRESHOLD" << "VARYING_PROBABILITY_REPORT"
+    << "PROGRESS_REPORT" << "RELEASE_EVENT_REPORT"
+    << "MOLECULE_COLLISION_REPORT" << "ALL_NOTIFICATIONS";
+
   QStringList of;
   of << "ON" << "OFF";
 
@@ -19,13 +26,6 @@ NotificationsModel::NotificationsModel(QObject* parent) :
 
   QStringList ob;
   ob << "ON" << "BRIEF";
-
-  noteKeyWords << "BOX_TRIANGULATION_REPORT" << "DIFFUSION_CONSTANT_REPORT"
-    << "FILE_OUTPUT_REPORT" << "FINAL_SUMMARY" << "ITERATION_REPORT"
-    << "PARTITION_LOCATION_REPORT" << "PROBABILITY_REPORT"
-    << "PROBABILITY_REPORT_THRESHOLD" << "VARYING_PROBABILITY_REPORT"
-    << "PROGRESS_REPORT" << "RELEASE_EVENT_REPORT"
-    << "MOLECULE_COLLISION_REPORT" << "ALL_NOTIFICATIONS";
 
   noteValues << of << ob << of << of << of << of << of << QStringList("1")
     << of << of << of << of << ofAll;
@@ -46,17 +46,17 @@ NotificationsModel::NotificationsModel(QObject* parent) :
 WarningsModel::WarningsModel(QObject* parent) :
   QStandardItemModel(parent) {
 
-  QStringList warn;
-  warn << "IGNORED" << "WARNING" << "ERROR";
-  QStringList warnAll(warn);
-  warnAll << "UNSET";
-
   warnKeyWords << "DEGENERATE_POLYGONS" << "HIGH_REACTION_PROBABILITY"
     << "HIGH_PROBABILITY_THRESHOLD" << "LIFETIME_TOO_SHORT"
     << "LIFETIME_THRESHOLD" << "MISSED_REACTIONS" << "MISSED_REACTION_THRESHOLD"
     << "NEGATIVE_DIFFUSION_CONSTANT" << "MISSING_SURFACE_ORIENTATION"
     << "NEGATIVE_REACTION_RATE" << "USELESS_VOLUME_ORIENTATION"
     << "ALL_WARNINGS";
+
+  QStringList warn;
+  warn << "IGNORED" << "WARNING" << "ERROR";
+  QStringList warnAll(warn);
+  warnAll << "UNSET";
 
   warnValues << warn << warn << QStringList("1.0") << warn << QStringList("50")
     << warn << QStringList("1e-3") << warn << warn << warn << warn << warnAll;
