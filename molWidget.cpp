@@ -83,8 +83,12 @@ QWidget* MolModelDelegate::createEditor(QWidget *parent,
   QComboBox* comb;
   switch (index.column()) {
     case Col::Name:
+      edit = new QLineEdit(parent);
+      edit->setValidator(new QRegExpValidator(molNameRegex_));
+      return edit;
     case Col::D:
       edit = new QLineEdit(parent);
+      edit->setValidator(new QDoubleValidator);
       return edit;
     case Col::Type:
       comb = new QComboBox(parent);
@@ -105,14 +109,9 @@ void MolModelDelegate::setEditorData(QWidget* editor,
   QComboBox* combo;
   switch (index.column()) {
     case Col::Name:
-      edit = qobject_cast<QLineEdit*>(editor);
-      Q_ASSERT(edit);
-      edit->setText(v.toString());
-      break;
     case Col::D:
       edit = qobject_cast<QLineEdit*>(editor);
       Q_ASSERT(edit);
-      edit->setValidator(new QDoubleValidator);
       edit->setText(v.toString());
       break;
     case Col::Type:
