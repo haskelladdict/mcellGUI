@@ -52,35 +52,36 @@ QVariant ReactionModel::data(const QModelIndex& index, int role) const {
   }
   int row = index.row();
   int col = index.column();
-  if (row < 0 || row >= reactions_.size() || col < 0 || col >= numCols_) {
+  int numRows = reactions_.size();
+  if (row < 0 || row >= numRows || col < 0 || col >= numCols_) {
     return QVariant();
   }
 
-  const Reaction& r = reactions_.at(row);
+  const Reaction* r = reactions_[row].get();
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     int col = index.column();
     if (col == ReactCol::Name) {
-      return r.name;
+      return r->name;
     } else if (col == ReactCol::Rate) {
-      return r.rate;
+      return r->rate;
     } else if (col == ReactCol::React1) {
-      return r.reactant1->name;
+      return r->reactant1->name;
     } else if (col == ReactCol::React2) {
-      if (r.reactant2 != nullptr) {
-        return r.reactant2->name;
+      if (r->reactant2 != nullptr) {
+        return r->reactant2->name;
       } else {
        return QString("");
       }
     } else if (col == ReactCol::Type) {
-      if (r.type == ReactType::UNI) {
+      if (r->type == ReactType::UNI) {
         return "->";
       } else {
         return "<->";
       }
     } else {
-      int p = col - ReactCol::Type - 1;
-      if (p < r.products.size()) {
-        return r.products[p]->name;
+      size_t p = col - ReactCol::Type - 1;
+      if (p < r->products.size()) {
+        return r->products[p]->name;
       } else {
         return QString("");
       }
@@ -96,25 +97,26 @@ bool ReactionModel::setData(const QModelIndex& index, const QVariant& value, int
   }
   int row = index.row();
   int col = index.column();
-  if (row < 0 || row >= reactions_.size() || col < 0 || col >= numCols_) {
+  int numRows = reactions_.size();
+  if (row < 0 || row >= numRows || col < 0 || col >= numCols_) {
     return false;
   }
 
-  Reaction& r = reactions_[row];
+  Reaction* r = reactions_[row].get();
   QString val = value.toString();
   if (col == ReactCol::Name) {
-    r.name = val;
+    r->name = val;
   } else if (col == ReactCol::Rate) {
-    r.rate = val;
+    r->rate = val;
   } else if (col == ReactCol::React1) {
     // retrieve mol and store
   } else if (col == ReactCol::React2) {
     // retrieve mol and store in model
   } else if (col == ReactCol::Type) {
     if (val == "->") {
-      r.type = ReactType::UNI;
+      r->type = ReactType::UNI;
     } else {
-      r.type = ReactType::BI;
+      r->type = ReactType::BI;
     }
   } else {
     int p = col - ReactCol::Type - 1;
@@ -137,9 +139,18 @@ Qt::ItemFlags ReactionModel::flags(const QModelIndex& index) const {
 // addReaction adds a new reaction to the model
 // NOTE: addReaction assumes that the given reaction is distinct from all
 // existing reactions
-void ReactionModel::addReaction(const Reaction& r) {
+void ReactionModel::addReaction(const QString& reactName, const QString& rate,
+    const Molecule* react1, const Molecule* react2, const ReactType& type,
+    std::vector<const Molecule*>&& products) {
+  auto r = std::unique_ptr<Reaction>(new Reaction);
+  r->name = reactName;
+  r->rate = rate;
+  r->reactant1 = react1;
+  r->reactant2 = react2;
+  r->type = type;
+  r->products = std::move(products);
   beginResetModel();
-  reactions_.insert(reactions_.size(), r);
+  reactions_.push_back(std::move(r));
   endResetModel();
   //molNames_[m.name] = 1;
 }

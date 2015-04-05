@@ -8,6 +8,7 @@
 #define REACTION_MODEL_HPP
 
 #include <map>
+#include <memory>
 #include <vector>
 
 #include <QAbstractTableModel>
@@ -27,9 +28,9 @@ struct Reaction {
   const Molecule* reactant1;
   const Molecule* reactant2;
   ReactType type;
-  QList<const Molecule*> products;
+  std::vector<const Molecule*> products;
 };
-using ReactList = QList<Reaction>;
+using ReactList = std::vector<std::unique_ptr<Reaction>>;
 
 // ReactCol::col lists column names (one per data element in Reaction with
 // exception of products since the number of products is not fixed and unknown)
@@ -58,7 +59,9 @@ public:
 
   // write methods
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
-  void addReaction(const Reaction& data);
+  void addReaction(const QString& reactName, const QString& rate,
+    const Molecule* react1, const Molecule* react2, const ReactType& type,
+    std::vector<const Molecule*>&& products);
 //  void delReaction(int rowID);
 
 

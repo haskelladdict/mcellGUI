@@ -4,6 +4,8 @@
 //
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
+#include <utility>
+
 #include <QComboBox>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -62,19 +64,19 @@ void ReactionWidget::deleteReactions() {
 // addReaction adds the molecule defined in the define molecule grouper to the
 // model after checking that it is complete and valid
 void ReactionWidget::addReaction() {
- /* if (molModel_.numMols() == 0) {
+ if (molModel_->numMols() == 0) {
     QMessageBox::critical(this, tr("No Molecule Defined"),
       tr("Please define at least one molecule before adding reactions"),
       QMessageBox::Close);
     return;
-  } */
+  }
   // construct a default reaction
   QString id;
   QString reactName = "newReaction_" + id.setNum(reactCount_++);
-  /*
-  Molecule* mol = molModel_.getMolecules()[0];
-  reactModel_->addReaction(Reaction{reactName, "0.0", mol, mol, ReactType::UNI});
-  */
+  Molecule* mol = molModel_->getMols()[0].get();
+  std::vector<const Molecule*> products;
+  reactModel_->addReaction(reactName, "0.0", mol, mol, ReactType::UNI,
+    std::move(products));
 }
 
 
