@@ -58,7 +58,7 @@ public:
 
   // write methods
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
-//  void addReaction(const Reaction& data);
+  void addReaction(const Reaction& data);
 //  void delReaction(int rowID);
 
 

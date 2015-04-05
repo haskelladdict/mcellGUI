@@ -11,25 +11,27 @@
 #include <QSortFilterProxyModel>
 #include <QWidget>
 
+#include "molModel.hpp"
 #include "reactionModel.hpp"
 #include "ui_reactionWidget.h"
 
-#if 0
-// MolModelDelegate defines custom delegates for the MolModel view
-class MolModelDelegate : public QItemDelegate {
+
+
+// ReactionModelDelegate defines custom delegates for the ReactionModel view
+class ReactionModelDelegate : public QItemDelegate {
 
     Q_OBJECT
 
 public:
-    MolModelDelegate(QWidget *parent = 0);
+    ReactionModelDelegate(QWidget *parent = 0);
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                           const QModelIndex &index) const;
     void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel* model,
-      const QModelIndex& index) const;
+//    void setModelData(QWidget *editor, QAbstractItemModel* model,
+//      const QModelIndex& index) const;
 };
-#endif
+
 
 // MolWidget is the main widget for handling molecule data
 class ReactionWidget : public QWidget, Ui::ReactionWidget {
@@ -39,46 +41,19 @@ class ReactionWidget : public QWidget, Ui::ReactionWidget {
 public:
   ReactionWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
 
-  void initModel(ReactionModel* model);
+  void initModel(ReactionModel* reactModel, const MolModel* molModel);
 
 private:
 
   int reactCount_ = 0;
-  ReactionModel* model_;
-//  ReactModelDelegate delegate_;
+  ReactionModel* reactModel_;
+  const MolModel* molModel_;
+  ReactionModelDelegate delegate_;
 
 private slots:
   void addReaction();
   void deleteReactions();
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 #endif

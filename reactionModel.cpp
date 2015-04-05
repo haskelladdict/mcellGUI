@@ -133,7 +133,19 @@ Qt::ItemFlags ReactionModel::flags(const QModelIndex& index) const {
   return flags;
 }
 
-/*
+
+// addReaction adds a new reaction to the model
+// NOTE: addReaction assumes that the given reaction is distinct from all
+// existing reactions
+void ReactionModel::addReaction(const Reaction& r) {
+  beginResetModel();
+  reactions_.insert(reactions_.size(), r);
+  endResetModel();
+  //molNames_[m.name] = 1;
+}
+
+
+#if 0
 // delMol deletes the molecule in the given row from the model
 // NOTE: since generateRowMapping_ updates the model views it appears that
 // we don't need to call beginRemoveRows and endRemoveRows
@@ -152,15 +164,6 @@ bool MolModel::haveMol(const QString& name) const {
 }
 
 
-// addMol adds a new molecule of the given data to the model
-// NOTE: addMol assumes that the molecule of name molName does not yet exist
-void MolModel::addMol(const Molecule& m) {
-  beginResetModel();
-  mols_.insert(mols_.size(), m);
-  endResetModel();
-  molNames_[m.name] = 1;
-}
-
 
 // getMol returns a read only reference to the underlying molecule map.
 // NOTE: This could probably be encapsulated a bit better without exposing
@@ -169,4 +172,4 @@ void MolModel::addMol(const Molecule& m) {
 const MolList& MolModel::getMols() const {
   return mols_;
 }
-*/
+#endif

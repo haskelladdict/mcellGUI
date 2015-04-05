@@ -5,6 +5,7 @@
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
 #include <QComboBox>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QShortcut>
 
@@ -16,7 +17,7 @@ ReactionWidget::ReactionWidget(QWidget* parent, Qt::WindowFlags flags) :
 
   setupUi(this);
   reactTableView->setSortingEnabled(true);
-//  reactTableView->setItemDelegate(&delegate_);
+  reactTableView->setItemDelegate(&delegate_);
 
   connect(addReactionButton, SIGNAL(clicked()), this, SLOT(addReaction()));
   connect(deleteReactionsButton, SIGNAL(clicked()), this, SLOT(deleteReactions()));
@@ -29,11 +30,13 @@ ReactionWidget::ReactionWidget(QWidget* parent, Qt::WindowFlags flags) :
 }
 
 
-// initModel initializes the widget's underlying molecule model
-void ReactionWidget::initModel(ReactionModel* model) {
-  model_ = model;
+// initModel initializes the widget's underlying reaction model. In addition
+// to the ReactionModel, the widget also keeps track of the MoleculeModel
+void ReactionWidget::initModel(ReactionModel* reactModel, const MolModel* molModel) {
+  reactModel_ = reactModel;
+  molModel_ = molModel;
   auto proxyModel = new QSortFilterProxyModel(this);
-  proxyModel->setSourceModel(model);
+  proxyModel->setSourceModel(reactModel_);
   reactTableView->setModel(proxyModel);
 }
 
@@ -59,19 +62,29 @@ void ReactionWidget::deleteReactions() {
 // addReaction adds the molecule defined in the define molecule grouper to the
 // model after checking that it is complete and valid
 void ReactionWidget::addReaction() {
-  // construct a default molecule
+ /* if (molModel_.numMols() == 0) {
+    QMessageBox::critical(this, tr("No Molecule Defined"),
+      tr("Please define at least one molecule before adding reactions"),
+      QMessageBox::Close);
+    return;
+  } */
+  // construct a default reaction
   QString id;
-  QString molName = "newMol_" + id.setNum(reactCount_++);
-//  model_->addMol(Molecule{molName, "0.0", MolType::VOL});
+  QString reactName = "newReaction_" + id.setNum(reactCount_++);
+  /*
+  Molecule* mol = molModel_.getMolecules()[0];
+  reactModel_->addReaction(Reaction{reactName, "0.0", mol, mol, ReactType::UNI});
+  */
 }
 
-#if 0
-// MolModelDelegate constructor
-MolModelDelegate::MolModelDelegate(QWidget *parent) :
+
+// ReactionModelDelegate constructor
+ReactionModelDelegate::ReactionModelDelegate(QWidget *parent) :
   QItemDelegate(parent) {};
 
+
 // createEditor creates the appropriate editor for each of the columns
-QWidget* MolModelDelegate::createEditor(QWidget *parent,
+QWidget* ReactionModelDelegate::createEditor(QWidget *parent,
   const QStyleOptionViewItem &option, const QModelIndex &index) const {
 
   Q_UNUSED(option)
@@ -79,14 +92,15 @@ QWidget* MolModelDelegate::createEditor(QWidget *parent,
   QLineEdit* edit;
   QComboBox* comb;
   switch (index.column()) {
-    case Col::Name:
-    case Col::D:
+    case ReactCol::Name:
+    case ReactCol::Rate:
+    case ReactCol::Type:
       edit = new QLineEdit(parent);
       return edit;
-    case Col::Type:
+    case ReactCol::React1:
+    case ReactCol::React2:
+    default:
       comb = new QComboBox(parent);
-      comb->addItem("3D");
-      comb->addItem("2D");
       return comb;
   }
   return nullptr;
@@ -94,25 +108,26 @@ QWidget* MolModelDelegate::createEditor(QWidget *parent,
 
 
 // setEditorData reads the data and writes it to the editor
-void MolModelDelegate::setEditorData(QWidget* editor,
+void ReactionModelDelegate::setEditorData(QWidget* editor,
   const QModelIndex& index) const {
 
   QVariant v = index.model()->data(index, Qt::EditRole);
   QLineEdit* edit;
   QComboBox* combo;
   switch (index.column()) {
-    case Col::Name:
+    case ReactCol::Name:
       edit = qobject_cast<QLineEdit*>(editor);
       Q_ASSERT(edit);
       edit->setText(v.toString());
       break;
-    case Col::D:
+    case ReactCol::Rate:
       edit = qobject_cast<QLineEdit*>(editor);
       Q_ASSERT(edit);
       edit->setValidator(new QDoubleValidator);
       edit->setText(v.toString());
       break;
-    case Col::Type:
+    case ReactCol::React1:
+    case ReactCol::React2:
       combo = qobject_cast<QComboBox*>(editor);
       Q_ASSERT(combo);
       combo->setCurrentText(v.toString());
@@ -123,7 +138,7 @@ void MolModelDelegate::setEditorData(QWidget* editor,
   }
 }
 
-
+#if 0
 // setModelData writes the data to the model based on the editor setting
 void MolModelDelegate::setModelData(QWidget *editor, QAbstractItemModel* model,
   const QModelIndex& index) const {
@@ -148,5 +163,4 @@ void MolModelDelegate::setModelData(QWidget *editor, QAbstractItemModel* model,
   }
 }
 #endif
-
 

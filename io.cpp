@@ -79,13 +79,13 @@ void writeMolecules(QTextStream& out, const MolList& molecules) {
   out << "DEFINE_MOLECULES {\n";
 
   for (const auto& m : molecules) {
-    out << TAB << m.name << " {\n";
-    if (m.type == MolType::VOL) {
+    out << TAB << m->name << " {\n";
+    if (m->type == MolType::VOL) {
       out << TAB << TAB << "DIFFUSION_CONSTANT_3D";
     } else {
       out << TAB << TAB << "DIFFUSION_CONSTANT_2D";
     }
-    out << " = " << m.D << "\n";
+    out << " = " << m->D << "\n";
     out << TAB << "}\n";
   }
   out << "}\n";

@@ -8,10 +8,10 @@
 #define MOL_MODEL_HPP
 
 #include <map>
+#include <memory>
 #include <vector>
 
 #include <QAbstractTableModel>
-#include <QList>
 #include <QString>
 
 // MolType classifies 2D (SURF) or 3D (VOL) molecules
@@ -23,7 +23,7 @@ struct Molecule {
   QString D;
   MolType type;
 };
-using MolList = QList<Molecule>;
+using MolList = std::vector<std::unique_ptr<Molecule>>;
 
 // Col names column types (one per data element in Molecule)
 namespace Col {
@@ -47,12 +47,13 @@ public:
   Qt::ItemFlags flags(const QModelIndex& index) const;
 
   bool haveMol(const QString& molName) const;
+  int numMols() const;
   const MolList& getMols() const;
 
   // write methods
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
-  void addMol(const Molecule& data);
-  void delMol(int rowID);
+  void addMol(const QString& name, const QString& D, const MolType& type);
+  void delMol(const QString& name);
 
 
 private:

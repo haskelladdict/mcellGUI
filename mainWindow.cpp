@@ -18,13 +18,13 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags flags) :
   // initialize and propagate models to view widgets
   molTab->initModel(&moleculeModel_);
   paramTab->initModel(&paramModel_);
-  reactTab->initModel(&reactModel_);
+  reactTab->initModel(&reactModel_, &moleculeModel_);
   noteWarnTab->initModel(&noteModel_, &warnModel_);
 
   // add some fake molecule data
-  moleculeModel_.addMol(Molecule{"A", "1e-3", MolType::VOL});
-  moleculeModel_.addMol(Molecule{"B", "33e-6", MolType::SURF});
-  moleculeModel_.addMol(Molecule{"C", "1e-3", MolType::VOL});
+  moleculeModel_.addMol("A", "1e-3", MolType::VOL);
+  moleculeModel_.addMol("B", "33e-6", MolType::SURF);
+  moleculeModel_.addMol("C", "1e-3", MolType::VOL);
 
   // signals and slots
   connect(exportMDLAction, SIGNAL(triggered(bool)), this, SLOT(exportMDL_()));

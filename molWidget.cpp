@@ -4,11 +4,12 @@
 //
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
+#include <QDebug>
+
 #include <set>
 
 #include <QComboBox>
 #include <QLineEdit>
-#include <QMessageBox>
 #include <QShortcut>
 
 #include "molWidget.hpp"
@@ -43,6 +44,9 @@ void MolWidget::initModel(MolModel* model) {
 
 
 // deleteMols deletes all currently selected molecules from the model
+// NOTE: we need to assemble the list of names first before we can
+// start deleting since the rowIDs are invalidated as soon as we touch
+// the model.
 void MolWidget::deleteMols() {
   auto selModel = molTableView->selectionModel();
   auto selIDs = selModel->selectedIndexes();
@@ -53,8 +57,12 @@ void MolWidget::deleteMols() {
   for (auto& i : selIDs) {
     uniqueRows.insert(i.row());
   }
+  std::set<QString> molNames;
   for (auto& r : uniqueRows) {
-    model_->delMol(r);
+    molNames.insert(model_->index(r, Col::Name).data().toString());
+  }
+  for (auto& n : molNames) {
+    model_->delMol(n);
   }
 }
 
@@ -65,7 +73,7 @@ void MolWidget::addMol() {
   // construct a default molecule
   QString id;
   QString molName = "newMol_" + id.setNum(molCount_++);
-  model_->addMol(Molecule{molName, "0.0", MolType::VOL});
+  model_->addMol(molName, "0.0", MolType::VOL);
 }
 
 // MolModelDelegate constructor

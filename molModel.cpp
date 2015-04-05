@@ -5,6 +5,8 @@
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
 #include <algorithm>
+#include <cassert>
+#include <utility>
 
 #include "molModel.hpp"
 
@@ -47,19 +49,20 @@ QVariant MolModel::data(const QModelIndex& index, int role) const {
   int row = index.row();
   int col = index.column();
   int numCols = headerLabels_.size();
-  if (row < 0 || row >= mols_.size() || col < 0 || col >= numCols) {
+  int numRows = mols_.size();
+  if (row < 0 || row >= numRows || col < 0 || col >= numCols) {
     return QVariant();
   }
 
-  const Molecule& m = mols_.at(row);
+  const Molecule* m = mols_[row].get();
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (index.column()) {
       case Col::Name:
-        return m.name;
+        return m->name;
       case Col::D:
-        return m.D;
+        return m->D;
       case Col::Type:
-        if (m.type == MolType::VOL) {
+        if (m->type == MolType::VOL) {
           return QString("3D");
         } else {
           return QString("2D");
@@ -79,11 +82,12 @@ bool MolModel::setData(const QModelIndex& index, const QVariant& value, int role
   int row = index.row();
   int col = index.column();
   int numCols = headerLabels_.size();
-  if (row < 0 || row >= mols_.size() || col < 0 || col >= numCols) {
+  int numRows = mols_.size();
+  if (row < 0 || row >= numRows || col < 0 || col >= numCols) {
     return false;
   }
 
-  Molecule& m = mols_[row];
+  Molecule* m = mols_[row].get();
   QString newName, D, type;
   switch (col) {
     case Col::Name:
@@ -91,23 +95,23 @@ bool MolModel::setData(const QModelIndex& index, const QVariant& value, int role
       if (newName.isEmpty() || haveMol(newName)) {
         return false;
       }
-      molNames_.erase(m.name);
+      molNames_.erase(m->name);
       molNames_[newName] = 1;
-      m.name = newName;
+      m->name = newName;
       break;
     case Col::D:
       D = value.toString();
       if (D.isEmpty()) {
         return false;
       }
-      m.D = D;
+      m->D = D;
       break;
     case Col::Type:
       type = value.toString();
       if (type == "2D") {
-        m.type = MolType::SURF;
+        m->type = MolType::SURF;
       } else if (type == "3D") {
-        m.type = MolType::VOL;
+        m->type = MolType::VOL;
       } else {
         return false;
       }
@@ -129,10 +133,13 @@ Qt::ItemFlags MolModel::flags(const QModelIndex& index) const {
 // delMol deletes the molecule in the given row from the model
 // NOTE: since generateRowMapping_ updates the model views it appears that
 // we don't need to call beginRemoveRows and endRemoveRows
-void MolModel::delMol(int rowID) {
-  molNames_.erase(mols_[rowID].name);
+void MolModel::delMol(const QString& name) {
+  molNames_.erase(name);
+  auto it = std::find_if(mols_.begin(), mols_.end(),
+    [&name](std::unique_ptr<Molecule> const& p) { return p->name == name; });
+  assert(it != mols_.end());
   beginResetModel();
-  mols_.removeAt(rowID);
+  mols_.erase(it);
   endResetModel();
 }
 
@@ -144,13 +151,25 @@ bool MolModel::haveMol(const QString& name) const {
 }
 
 
+// numMol returns the number of molecules available in the model
+int MolModel::numMols() const {
+  return mols_.size();
+}
+
+
 // addMol adds a new molecule of the given data to the model
 // NOTE: addMol assumes that the molecule of name molName does not yet exist
-void MolModel::addMol(const Molecule& m) {
+void MolModel::addMol(const QString& name, const QString& D, const MolType& type) {
+  // create new Molecule
+  auto m = std::unique_ptr<Molecule>(new Molecule());
+  m->name = name;
+  m->D = D;
+  m->type = type;
+
   beginResetModel();
-  mols_.insert(mols_.size(), m);
+  mols_.push_back(std::move(m));
   endResetModel();
-  molNames_[m.name] = 1;
+  molNames_[name] = 1;
 }
 
 
