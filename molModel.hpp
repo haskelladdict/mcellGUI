@@ -49,6 +49,8 @@ public:
   bool haveMol(const QString& molName) const;
   int numMols() const;
   const MolList& getMols() const;
+  const Molecule* getMolecule(QString name) const;
+  QStringList getMolNames() const;
 
   // write methods
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
@@ -58,7 +60,6 @@ public:
 
 private:
   MolList mols_;
-  std::map<QString, int> molNames_;
 
   std::vector<QString> headerLabels_ = {"molecule name", "D", "type"};
 };

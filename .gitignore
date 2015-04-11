@@ -1,5 +1,7 @@
 # C++ objects and libs
 
+*.tags*
+
 *.slo
 *.lo
 *.o

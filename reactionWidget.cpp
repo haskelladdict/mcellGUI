@@ -19,7 +19,6 @@ ReactionWidget::ReactionWidget(QWidget* parent, Qt::WindowFlags flags) :
 
   setupUi(this);
   reactTableView->setSortingEnabled(true);
-  reactTableView->setItemDelegate(&delegate_);
 
   connect(addReactionButton, SIGNAL(clicked()), this, SLOT(addReaction()));
   connect(deleteReactionsButton, SIGNAL(clicked()), this, SLOT(deleteReactions()));
@@ -34,13 +33,18 @@ ReactionWidget::ReactionWidget(QWidget* parent, Qt::WindowFlags flags) :
 
 // initModel initializes the widget's underlying reaction model. In addition
 // to the ReactionModel, the widget also keeps track of the MoleculeModel
-void ReactionWidget::initModel(ReactionModel* reactModel, const MolModel* molModel) {
+void ReactionWidget::initModel(ReactionModel* reactModel, MolModel* molModel) {
   reactModel_ = reactModel;
   molModel_ = molModel;
+
   auto proxyModel = new QSortFilterProxyModel(this);
   proxyModel->setSourceModel(reactModel_);
   reactTableView->setModel(proxyModel);
+
+  ReactionModelDelegate* del = new ReactionModelDelegate(molModel, this);
+  reactTableView->setItemDelegate(del);
 }
+
 
 // deleteReactions deletes all currently selected molecules from the model
 void ReactionWidget::deleteReactions() {
@@ -64,7 +68,7 @@ void ReactionWidget::deleteReactions() {
 // addReaction adds the molecule defined in the define molecule grouper to the
 // model after checking that it is complete and valid
 void ReactionWidget::addReaction() {
- if (molModel_->numMols() == 0) {
+  if (molModel_->numMols() == 0) {
     QMessageBox::critical(this, tr("No Molecule Defined"),
       tr("Please define at least one molecule before adding reactions"),
       QMessageBox::Close);
@@ -72,17 +76,20 @@ void ReactionWidget::addReaction() {
   }
   // construct a default reaction
   QString id;
-  QString reactName = "newReaction_" + id.setNum(reactCount_++);
-  Molecule* mol = molModel_->getMols()[0].get();
+  QString reactName = "reac_" + id.setNum(reactCount_++);
+  Molecule* mol = molModel_->getMols()[1].get();
   std::vector<const Molecule*> products;
+  products.push_back(mol);
   reactModel_->addReaction(reactName, "0.0", mol, mol, ReactType::UNI,
     std::move(products));
 }
 
 
 // ReactionModelDelegate constructor
-ReactionModelDelegate::ReactionModelDelegate(QWidget *parent) :
-  QItemDelegate(parent) {};
+// NOTE: The delegate needs access to the molModel in order to populate
+// properly populate the molecule selectors with the available molecule names
+ReactionModelDelegate::ReactionModelDelegate(const MolModel* molModel,
+  QWidget *parent) : QItemDelegate(parent), molModel_(molModel) {};
 
 
 // createEditor creates the appropriate editor for each of the columns
@@ -96,14 +103,25 @@ QWidget* ReactionModelDelegate::createEditor(QWidget *parent,
   switch (index.column()) {
     case ReactCol::Name:
     case ReactCol::Rate:
-    case ReactCol::Type:
       edit = new QLineEdit(parent);
       return edit;
+    case ReactCol::Type:
+      comb = new QComboBox(parent);
+      comb->addItem("->");
+      comb->addItem("<->");
+      return comb;
     case ReactCol::React1:
     case ReactCol::React2:
-    default:
       comb = new QComboBox(parent);
+      comb->addItems(molModel_->getMolNames());
       return comb;
+    case ReactCol::Prod1:
+      comb = new QComboBox(parent);
+      comb->addItem("NULL");
+      comb->addItems(molModel_->getMolNames());
+      return comb;
+    default:
+      break;
   }
   return nullptr;
 }
@@ -128,8 +146,10 @@ void ReactionModelDelegate::setEditorData(QWidget* editor,
       edit->setValidator(new QDoubleValidator);
       edit->setText(v.toString());
       break;
+    case ReactCol::Type:
     case ReactCol::React1:
     case ReactCol::React2:
+    case ReactCol::Prod1:
       combo = qobject_cast<QComboBox*>(editor);
       Q_ASSERT(combo);
       combo->setCurrentText(v.toString());
@@ -140,29 +160,44 @@ void ReactionModelDelegate::setEditorData(QWidget* editor,
   }
 }
 
-#if 0
+
 // setModelData writes the data to the model based on the editor setting
-void MolModelDelegate::setModelData(QWidget *editor, QAbstractItemModel* model,
+// NOTE: Currently we send the molecule info to the reaction model as void
+// pointers within a QVariant. This seems a bit hackish and could perhaps be
+// improved.
+void ReactionModelDelegate::setModelData(QWidget *editor, QAbstractItemModel* model,
   const QModelIndex& index) const {
 
   QLineEdit* edit;
   QComboBox* combo;
+  QVariant v;
+  const Molecule* mol;
   switch (index.column()) {
-    case Col::Name:
-    case Col::D:
+    case ReactCol::Name:
+    case ReactCol::Rate:
       edit = qobject_cast<QLineEdit*>(editor);
       Q_ASSERT(edit);
       model->setData(index, edit->text());
       break;
-    case Col::Type:
+    case ReactCol::Type:
       combo = qobject_cast<QComboBox*>(editor);
       Q_ASSERT(edit);
       model->setData(index, combo->currentText());
+      break;
+    case ReactCol::React1:
+    case ReactCol::React2:
+    case ReactCol::Prod1:
+      combo = qobject_cast<QComboBox*>(editor);
+      mol = molModel_->getMolecule(combo->currentText());
+      if (mol == nullptr) {
+        return;
+      }
+      v = qVariantFromValue((void *)mol);
+      model->setData(index, v);
       break;
     default:
       QItemDelegate::setModelData(editor, model, index);
       break;
   }
 }
-#endif
 

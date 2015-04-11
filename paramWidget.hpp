@@ -16,7 +16,7 @@
 
 class ParamModel;
 
-// ParamModelDelegate defines a custom delegate between combo-boxes and the model
+// ComboBoxModelDelegate defines a custom delegate between combo-boxes and the model
 class ComboBoxModelDelegate : public QItemDelegate {
 
     Q_OBJECT

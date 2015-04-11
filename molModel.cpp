@@ -95,8 +95,6 @@ bool MolModel::setData(const QModelIndex& index, const QVariant& value, int role
       if (newName.isEmpty() || haveMol(newName)) {
         return false;
       }
-      molNames_.erase(m->name);
-      molNames_[newName] = 1;
       m->name = newName;
       break;
     case Col::D:
@@ -134,7 +132,6 @@ Qt::ItemFlags MolModel::flags(const QModelIndex& index) const {
 // NOTE: since generateRowMapping_ updates the model views it appears that
 // we don't need to call beginRemoveRows and endRemoveRows
 void MolModel::delMol(const QString& name) {
-  molNames_.erase(name);
   auto it = std::find_if(mols_.begin(), mols_.end(),
     [&name](std::unique_ptr<Molecule> const& p) { return p->name == name; });
   assert(it != mols_.end());
@@ -147,7 +144,9 @@ void MolModel::delMol(const QString& name) {
 // haveMol returns true if a molecule with the provided name exists and false
 // otherwise
 bool MolModel::haveMol(const QString& name) const {
-  return molNames_.find(name) != molNames_.end();
+  auto it = std::find_if(mols_.begin(), mols_.end(),
+    [&name](std::unique_ptr<Molecule> const& p) { return p->name == name; });
+  return it != mols_.end();
 }
 
 
@@ -169,7 +168,6 @@ void MolModel::addMol(const QString& name, const QString& D, const MolType& type
   beginResetModel();
   mols_.push_back(std::move(m));
   endResetModel();
-  molNames_[name] = 1;
 }
 
 
@@ -180,3 +178,31 @@ void MolModel::addMol(const QString& name, const QString& D, const MolType& type
 const MolList& MolModel::getMols() const {
   return mols_;
 }
+
+// getMolecule returns a pointer to the molecule of given name
+const Molecule* MolModel::getMolecule(QString name) const {
+  auto it = std::find_if(mols_.begin(), mols_.end(),
+    [&name](std::unique_ptr<Molecule> const& p) { return p->name == name; });
+  if (it == mols_.end()) {
+    return nullptr;
+  }
+  return it->get();
+}
+
+
+// getMolNames returns the list of current molecule names
+QStringList MolModel::getMolNames() const {
+  QStringList names;
+  for (auto &i : mols_) {
+    names << i->name;
+  }
+  return names;
+}
+
+
+
+
+
+
+
+

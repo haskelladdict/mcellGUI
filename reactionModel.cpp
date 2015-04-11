@@ -9,8 +9,8 @@
 #include "reactionModel.hpp"
 
 // constructor
-ReactionModel::ReactionModel(QObject* parent) : QAbstractTableModel(parent),
-  numCols_(headerLabels_.size()) {}
+ReactionModel::ReactionModel(QObject* parent) :
+  QAbstractTableModel(parent), numCols_(headerLabels_.size()) {}
 
 
 // rowCount returns the number of rows in the model
@@ -23,7 +23,6 @@ int ReactionModel::rowCount(const QModelIndex& parent) const {
 int ReactionModel::columnCount(const QModelIndex& parent) const {
   return parent.isValid() ? 0 : numCols_;
 }
-
 
 // headerData prints the table headers
 QVariant ReactionModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -43,7 +42,6 @@ QVariant ReactionModel::headerData(int section, Qt::Orientation orientation, int
   }
   return QVariant();
 }
-
 
 // data returns the data contained at index
 QVariant ReactionModel::data(const QModelIndex& index, int role) const {
@@ -91,7 +89,7 @@ QVariant ReactionModel::data(const QModelIndex& index, int role) const {
 }
 
 // setData enables editing of model properties via model views
-bool ReactionModel::setData(const QModelIndex& index, const QVariant& value, int role) {
+bool ReactionModel::setData(const QModelIndex& index, const QVariant& v, int role) {
   if (!index.isValid() || role != Qt::EditRole) {
     return false;
   }
@@ -103,23 +101,22 @@ bool ReactionModel::setData(const QModelIndex& index, const QVariant& value, int
   }
 
   Reaction* r = reactions_[row].get();
-  QString val = value.toString();
   if (col == ReactCol::Name) {
-    r->name = val;
+    r->name = v.toString();
   } else if (col == ReactCol::Rate) {
-    r->rate = val;
+    r->rate = v.toString();
   } else if (col == ReactCol::React1) {
-    // retrieve mol and store
+    r->reactant1 = static_cast<const Molecule*>(v.value<void *>());
   } else if (col == ReactCol::React2) {
-    // retrieve mol and store in model
+     r->reactant2 = static_cast<const Molecule*>(v.value<void *>());
   } else if (col == ReactCol::Type) {
-    if (val == "->") {
+    if (v.toString() == "->") {
       r->type = ReactType::UNI;
     } else {
       r->type = ReactType::BI;
     }
   } else {
-    int p = col - ReactCol::Type - 1;
+    //int p = col - ReactCol::Type - 1;
     // retrieve product and store
   }
   emit dataChanged(index, index);

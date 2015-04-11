@@ -28,11 +28,11 @@ public:
 private:
 
   // data models
-  MolModel moleculeModel_;
-  ParamModel paramModel_;
-  NotificationsModel noteModel_;
-  WarningsModel warnModel_;
-  ReactionModel reactModel_;
+  MolModel* moleculeModel_;
+  ParamModel* paramModel_;
+  NotificationsModel* noteModel_;
+  WarningsModel* warnModel_;
+  ReactionModel* reactModel_;
 
 private slots:
 

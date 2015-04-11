@@ -16,15 +16,23 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags flags) :
   setupUi(this);
 
   // initialize and propagate models to view widgets
-  molTab->initModel(&moleculeModel_);
-  paramTab->initModel(&paramModel_);
-  reactTab->initModel(&reactModel_, &moleculeModel_);
-  noteWarnTab->initModel(&noteModel_, &warnModel_);
+  ParamModel* paramModel_ = new ParamModel(this);
+  paramTab->initModel(paramModel_);
+
+  NotificationsModel* noteModel_ = new NotificationsModel(this);
+  WarningsModel* warnModel_ = new WarningsModel(this);
+  noteWarnTab->initModel(noteModel_, warnModel_);
+
+  MolModel* moleculeModel_ = new MolModel(this);
+  molTab->initModel(moleculeModel_);
+
+  ReactionModel* reactModel_ = new ReactionModel(this);
+  reactTab->initModel(reactModel_, moleculeModel_);
 
   // add some fake molecule data
-  moleculeModel_.addMol("A", "1e-3", MolType::VOL);
-  moleculeModel_.addMol("B", "33e-6", MolType::SURF);
-  moleculeModel_.addMol("C", "1e-3", MolType::VOL);
+  moleculeModel_->addMol("A", "1e-3", MolType::VOL);
+  moleculeModel_->addMol("B", "33e-6", MolType::SURF);
+  moleculeModel_->addMol("C", "1e-3", MolType::VOL);
 
   // signals and slots
   connect(exportMDLAction, SIGNAL(triggered(bool)), this, SLOT(exportMDL_()));
@@ -39,7 +47,7 @@ void MainWindow::exportMDL_() {
   if (mdlFileName.isEmpty()) {
     return;
   }
-  writeMDL(mdlFileName, moleculeModel_.getMols(), paramModel_, noteModel_,
+  writeMDL(mdlFileName, moleculeModel_->getMols(), paramModel_, noteModel_,
     warnModel_);
 }
 
