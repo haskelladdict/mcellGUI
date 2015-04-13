@@ -19,6 +19,7 @@ enum class MolType {SURF, VOL};
 
 // Molecule class stores the data for a single molecule
 struct Molecule {
+  long id;
   QString name;
   QString D;
   MolType type;
@@ -59,6 +60,7 @@ public:
 
 
 private:
+  long molID_;
   MolList mols_;
 
   std::vector<QString> headerLabels_ = {"molecule name", "D", "type"};
