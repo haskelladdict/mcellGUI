@@ -10,6 +10,7 @@
 
 #include <QComboBox>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QShortcut>
 
 #include "molWidget.hpp"
@@ -62,7 +63,12 @@ void MolWidget::deleteMols() {
     molNames.insert(model_->index(r, Col::Name).data().toString());
   }
   for (auto& n : molNames) {
-    model_->delMol(n);
+    bool ok = model_->delMol(n);
+    if (!ok) {
+      QString msg =  "Molecule " + n + " is still in use and can't be deleted.";
+      QMessageBox::critical(this, tr("Molecule Still In Use"),
+        tr(msg.toLatin1().data()), QMessageBox::Close);
+    }
   }
 }
 

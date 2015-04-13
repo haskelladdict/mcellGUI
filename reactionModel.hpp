@@ -61,8 +61,14 @@ public:
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
   void addReaction(const QString& reactName, const QString& rate,
     const Molecule* react1, const Molecule* react2, const ReactType& type,
-    std::vector<const Molecule*>&& products);
+    const Molecule* prod1);
 //  void delReaction(int rowID);
+
+
+signals:
+
+  void useMol(long id);
+  void unuseMol(long id);
 
 
 private:

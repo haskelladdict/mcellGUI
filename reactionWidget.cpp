@@ -80,8 +80,7 @@ void ReactionWidget::addReaction() {
   Molecule* mol = molModel_->getMols()[1].get();
   std::vector<const Molecule*> products;
   products.push_back(mol);
-  reactModel_->addReaction(reactName, "0.0", mol, mol, ReactType::UNI,
-    std::move(products));
+  reactModel_->addReaction(reactName, "0.0", mol, mol, ReactType::UNI, mol);
 }
 
 
@@ -111,8 +110,12 @@ QWidget* ReactionModelDelegate::createEditor(QWidget *parent,
       comb->addItem("<->");
       return comb;
     case ReactCol::React1:
+      comb = new QComboBox(parent);
+      comb->addItems(molModel_->getMolNames());
+      return comb;
     case ReactCol::React2:
       comb = new QComboBox(parent);
+      comb->addItem("---");
       comb->addItems(molModel_->getMolNames());
       return comb;
     case ReactCol::Prod1:
@@ -189,9 +192,6 @@ void ReactionModelDelegate::setModelData(QWidget *editor, QAbstractItemModel* mo
     case ReactCol::Prod1:
       combo = qobject_cast<QComboBox*>(editor);
       mol = molModel_->getMolecule(combo->currentText());
-      if (mol == nullptr) {
-        return;
-      }
       v = qVariantFromValue((void *)mol);
       model->setData(index, v);
       break;

@@ -56,11 +56,18 @@ public:
   // write methods
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
   void addMol(const QString& name, const QString& D, const MolType& type);
-  void delMol(const QString& name);
+  bool delMol(const QString& name);
+
+
+public slots:
+
+  void markMoleculeUsed(long id);
+  void markMoleculeUnused(long id);
 
 
 private:
   long molID_;
+  std::map<int, int> molUseTracker_;
   MolList mols_;
 
   std::vector<QString> headerLabels_ = {"molecule name", "D", "type"};

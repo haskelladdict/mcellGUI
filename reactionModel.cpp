@@ -106,9 +106,21 @@ bool ReactionModel::setData(const QModelIndex& index, const QVariant& v, int rol
   } else if (col == ReactCol::Rate) {
     r->rate = v.toString();
   } else if (col == ReactCol::React1) {
+    if (r->reactant1 != nullptr) {
+      emit(unuseMol(r->reactant1->id));
+    }
     r->reactant1 = static_cast<const Molecule*>(v.value<void *>());
+    if (r->reactant1 != nullptr) {
+      emit(useMol(r->reactant1->id));
+    }
   } else if (col == ReactCol::React2) {
-     r->reactant2 = static_cast<const Molecule*>(v.value<void *>());
+    if (r->reactant2 != nullptr) {
+      emit(unuseMol(r->reactant2->id));
+    }
+    r->reactant2 = static_cast<const Molecule*>(v.value<void *>());
+    if (r->reactant2 != nullptr) {
+      emit(useMol(r->reactant2->id));
+    }
   } else if (col == ReactCol::Type) {
     if (v.toString() == "->") {
       r->type = ReactType::UNI;
@@ -138,46 +150,47 @@ Qt::ItemFlags ReactionModel::flags(const QModelIndex& index) const {
 // existing reactions
 void ReactionModel::addReaction(const QString& reactName, const QString& rate,
     const Molecule* react1, const Molecule* react2, const ReactType& type,
-    std::vector<const Molecule*>&& products) {
+    const Molecule* prod1) {
   auto r = std::unique_ptr<Reaction>(new Reaction);
   r->name = reactName;
   r->rate = rate;
   r->reactant1 = react1;
+  emit(useMol(react1->id));
+
   r->reactant2 = react2;
+  emit(useMol(react2->id));
+
   r->type = type;
+  std::vector<const Molecule*> products{prod1};
+  emit(useMol(prod1->id));
   r->products = std::move(products);
+
   beginResetModel();
   reactions_.push_back(std::move(r));
   endResetModel();
-  //molNames_[m.name] = 1;
 }
-
 
 #if 0
-// delMol deletes the molecule in the given row from the model
-// NOTE: since generateRowMapping_ updates the model views it appears that
-// we don't need to call beginRemoveRows and endRemoveRows
-void MolModel::delMol(int rowID) {
-  molNames_.erase(mols_[rowID].name);
+// deleteReaction deletes the selected reaction from the model
+void ReactionModel::delReaction(const QString& reactName, const QString& rate,
+    const Molecule* react1, const Molecule* react2, const ReactType& type,
+    const Molecule* prod1) {
+  auto r = std::unique_ptr<Reaction>(new Reaction);
+  r->name = reactName;
+  r->rate = rate;
+  r->reactant1 = react1;
+  emit(useMol(react1->id));
+
+  r->reactant2 = react2;
+  emit(useMol(react2->id));
+
+  r->type = type;
+  std::vector<const Molecule*> products{prod1};
+  emit(useMol(prod1->id));
+  r->products = std::move(products);
+
   beginResetModel();
-  mols_.removeAt(rowID);
+  reactions_.push_back(std::move(r));
   endResetModel();
-}
-
-
-// haveMol returns true if a molecule with the provided name exists and false
-// otherwise
-bool MolModel::haveMol(const QString& name) const {
-  return molNames_.find(name) != molNames_.end();
-}
-
-
-
-// getMol returns a read only reference to the underlying molecule map.
-// NOTE: This could probably be encapsulated a bit better without exposing
-// the internals of how molecules are stored within the model. However,
-// returning a const MolMap& seems more efficient for the time being.
-const MolList& MolModel::getMols() const {
-  return mols_;
 }
 #endif

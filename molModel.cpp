@@ -4,6 +4,8 @@
 //
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
+#include <QDebug>
+
 #include <algorithm>
 #include <cassert>
 #include <utility>
@@ -132,13 +134,24 @@ Qt::ItemFlags MolModel::flags(const QModelIndex& index) const {
 // delMol deletes the molecule in the given row from the model
 // NOTE: since generateRowMapping_ updates the model views it appears that
 // we don't need to call beginRemoveRows and endRemoveRows
-void MolModel::delMol(const QString& name) {
+// NOTE1: We also need to check that the model to be deleted is not curently
+// used by any view. If it is, we don't delete and return false instead.
+bool MolModel::delMol(const QString& name) {
   auto it = std::find_if(mols_.begin(), mols_.end(),
     [&name](std::unique_ptr<Molecule> const& p) { return p->name == name; });
   assert(it != mols_.end());
+
+  // check that no part of the GUI references this molecule before deleting
+  long molID = it->get()->id;
+  if (molUseTracker_.find(molID) != molUseTracker_.end() &&
+      molUseTracker_[molID] != 0) {
+    return false;
+  }
+
   beginResetModel();
   mols_.erase(it);
   endResetModel();
+  return true;
 }
 
 
@@ -202,9 +215,25 @@ QStringList MolModel::getMolNames() const {
 }
 
 
+// markMoleculeUsed is a slot for marking the molecule with id as used in
+// another part of the GUI (such as reactions widget, count widget, ...).
+void MolModel::markMoleculeUsed(long id) {
+  if (molUseTracker_.find(id) == molUseTracker_.end()) {
+    molUseTracker_[id] = 1;
+  } else {
+    molUseTracker_[id] += 1;
+  }
+  qDebug() << "using molecule " << id;
+}
 
 
-
-
+// markMoleculeUnused is a slot for marking the molecule with id as unused in
+// another part of the GUI (such as reactions widget, count widget, ...).
+void MolModel::markMoleculeUnused(long id) {
+  assert(molUseTracker_.find(id) != molUseTracker_.end());
+  assert(molUseTracker_[id] != 0);
+  molUseTracker_[id] -= 1;
+  qDebug() << "un-using molecule " << id;
+}
 
 

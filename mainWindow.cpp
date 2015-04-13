@@ -29,6 +29,12 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags flags) :
   ReactionModel* reactModel_ = new ReactionModel(this);
   reactTab->initModel(reactModel_, moleculeModel_);
 
+  // connect reaction model to molecule tracked in molecule model
+  connect(reactModel_, SIGNAL(useMol(long)), moleculeModel_,
+    SLOT(markMoleculeUsed(long)));
+  connect(reactModel_, SIGNAL(unuseMol(long)), moleculeModel_,
+    SLOT(markMoleculeUnused(long)));
+
   // add some fake molecule data
   moleculeModel_->addMol("A", "1e-3", MolType::VOL);
   moleculeModel_->addMol("B", "33e-6", MolType::SURF);
