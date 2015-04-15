@@ -5,12 +5,13 @@
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
 #include <algorithm>
+#include <cassert>
 
 #include "reactionModel.hpp"
 
 // constructor
 ReactionModel::ReactionModel(QObject* parent) :
-  QAbstractTableModel(parent), numCols_(headerLabels_.size()) {}
+  QAbstractTableModel(parent), reactCount_(0), numCols_(headerLabels_.size()) {}
 
 
 // rowCount returns the number of rows in the model
@@ -59,7 +60,9 @@ QVariant ReactionModel::data(const QModelIndex& index, int role) const {
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     int col = index.column();
     if (col == ReactCol::Name) {
-      return r->name;
+      // we return both the name as well as the reaction id since only the
+      // latter allows to uniquely identify a reaction (the name is not unique)
+      return QVariant(QList<QVariant>({r->name, r->id}));
     } else if (col == ReactCol::Rate) {
       return r->rate;
     } else if (col == ReactCol::React1) {
@@ -152,6 +155,7 @@ void ReactionModel::addReaction(const QString& reactName, const QString& rate,
     const Molecule* react1, const Molecule* react2, const ReactType& type,
     const Molecule* prod1) {
   auto r = std::unique_ptr<Reaction>(new Reaction);
+  r->id = reactCount_++;
   r->name = reactName;
   r->rate = rate;
   r->reactant1 = react1;
@@ -170,27 +174,15 @@ void ReactionModel::addReaction(const QString& reactName, const QString& rate,
   endResetModel();
 }
 
-#if 0
+
 // deleteReaction deletes the selected reaction from the model
-void ReactionModel::delReaction(const QString& reactName, const QString& rate,
-    const Molecule* react1, const Molecule* react2, const ReactType& type,
-    const Molecule* prod1) {
-  auto r = std::unique_ptr<Reaction>(new Reaction);
-  r->name = reactName;
-  r->rate = rate;
-  r->reactant1 = react1;
-  emit(useMol(react1->id));
-
-  r->reactant2 = react2;
-  emit(useMol(react2->id));
-
-  r->type = type;
-  std::vector<const Molecule*> products{prod1};
-  emit(useMol(prod1->id));
-  r->products = std::move(products);
+void ReactionModel::delReaction(qlonglong reactID) {
+  auto it = std::find_if(reactions_.begin(), reactions_.end(),
+    [reactID] (const std::unique_ptr<Reaction> &p) { return p->id == reactID; });
+  assert(it != reactions_.end());
 
   beginResetModel();
-  reactions_.push_back(std::move(r));
+  reactions_.erase(it);
   endResetModel();
 }
-#endif
+

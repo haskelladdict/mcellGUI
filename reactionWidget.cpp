@@ -4,6 +4,9 @@
 //
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
+#include <QDebug>
+
+#include <set>
 #include <utility>
 
 #include <QComboBox>
@@ -53,15 +56,19 @@ void ReactionWidget::deleteReactions() {
   if (selIDs.size() == 0) {
     return;
   }
-/*
+
   std::set<int> uniqueRows;
   for (auto& i : selIDs) {
     uniqueRows.insert(i.row());
   }
+  std::set<int> reactIDs;
   for (auto& r : uniqueRows) {
-    model_->delMol(r);
+    QList<QVariant> ql = reactModel_->index(r, Col::Name).data().toList();
+    reactIDs.insert(ql[1].toLongLong());
   }
-  */
+  for (auto& i : reactIDs) {
+    reactModel_->delReaction(i);
+  }
 }
 
 
@@ -137,11 +144,15 @@ void ReactionModelDelegate::setEditorData(QWidget* editor,
   QVariant v = index.model()->data(index, Qt::EditRole);
   QLineEdit* edit;
   QComboBox* combo;
+  QList<QVariant> ql;
   switch (index.column()) {
     case ReactCol::Name:
       edit = qobject_cast<QLineEdit*>(editor);
       Q_ASSERT(edit);
-      edit->setText(v.toString());
+      // the name property returns both the non-unique reaction name
+      // as well as the unique reaction id
+      ql = v.toList();
+      edit->setText(ql[0].toString());
       break;
     case ReactCol::Rate:
       edit = qobject_cast<QLineEdit*>(editor);

@@ -66,7 +66,7 @@ public slots:
 
 
 private:
-  long molID_;
+  long molCount_;
   std::map<int, int> molUseTracker_;
   MolList mols_;
 

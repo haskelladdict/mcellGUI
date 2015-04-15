@@ -23,6 +23,7 @@ enum class ReactType {UNI, BI};
 
 // Reaction class stores the data for a single reaction
 struct Reaction {
+  qlonglong id;
   QString name;
   QString rate;
   const Molecule* reactant1;
@@ -62,7 +63,7 @@ public:
   void addReaction(const QString& reactName, const QString& rate,
     const Molecule* react1, const Molecule* react2, const ReactType& type,
     const Molecule* prod1);
-//  void delReaction(int rowID);
+  void delReaction(qlonglong rowID);
 
 
 signals:
@@ -72,9 +73,8 @@ signals:
 
 
 private:
+  long reactCount_;
   ReactList reactions_;
-
-  //std::map<QString, int> reactNames_;
 
   std::vector<QString> headerLabels_ = {"reaction name", "rate", "reactant 1",
     "reactant2", "type", "product 1"};

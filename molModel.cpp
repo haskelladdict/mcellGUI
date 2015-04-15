@@ -14,7 +14,7 @@
 
 // constructor
 MolModel::MolModel(QObject* parent) : QAbstractTableModel(parent),
-  molID_(0)  {}
+  molCount_(0)  {}
 
 
 // rowCount returns the number of rows in the model
@@ -178,7 +178,7 @@ void MolModel::addMol(const QString& name, const QString& D, const MolType& type
   m->name = name;
   m->D = D;
   m->type = type;
-  m->id = molID_++;
+  m->id = molCount_++;
 
   beginResetModel();
   mols_.push_back(std::move(m));
