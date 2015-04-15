@@ -4,8 +4,6 @@
 //
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
-#include <QDebug>
-
 #include <set>
 #include <utility>
 
@@ -211,4 +209,33 @@ void ReactionModelDelegate::setModelData(QWidget *editor, QAbstractItemModel* mo
       break;
   }
 }
+
+
+// we need to re-implement the paint function to properly display the
+// reaction name since the model returns a QList<QVariant> containing
+// both the name and the unique reaction ID.
+void ReactionModelDelegate::paint(QPainter* painter,
+  const QStyleOptionViewItem &option, const QModelIndex &index) const {
+
+  if (index.column() == ReactCol::Name) {
+    QVariant v = index.model()->data(index, Qt::EditRole);
+    QList<QVariant> qv = v.toList();
+    drawDisplay(painter, option, option.rect, qv[0].toString());
+    drawFocus(painter, option, option.rect);
+  } else{
+    QItemDelegate::paint(painter, option, index);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
