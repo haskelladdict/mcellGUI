@@ -4,6 +4,8 @@
 //
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
+#include <QDebug>
+
 #include <set>
 #include <utility>
 
@@ -41,6 +43,7 @@ void ReactionWidget::initModel(ReactionModel* reactModel, MolModel* molModel) {
   auto proxyModel = new QSortFilterProxyModel(this);
   proxyModel->setSourceModel(reactModel_);
   reactTableView->setModel(proxyModel);
+  reactTableView->setColumnHidden(0,true);
 
   ReactionModelDelegate* del = new ReactionModelDelegate(molModel, this);
   reactTableView->setItemDelegate(del);
@@ -61,8 +64,9 @@ void ReactionWidget::deleteReactions() {
   }
   std::set<int> reactIDs;
   for (auto& r : uniqueRows) {
-    QList<QVariant> ql = reactModel_->index(r, Col::Name).data().toList();
-    reactIDs.insert(ql[1].toLongLong());
+    auto ql = reactModel_->index(r, ReactCol::ID).data().toLongLong();
+    qDebug() << "deleting " << ql;
+    reactIDs.insert(ql);
   }
   for (auto& i : reactIDs) {
     reactModel_->delReaction(i);
@@ -105,6 +109,7 @@ QWidget* ReactionModelDelegate::createEditor(QWidget *parent,
   QLineEdit* edit;
   QComboBox* comb;
   switch (index.column()) {
+    case ReactCol::ID:
     case ReactCol::Name:
     case ReactCol::Rate:
       edit = new QLineEdit(parent);
@@ -142,15 +147,18 @@ void ReactionModelDelegate::setEditorData(QWidget* editor,
   QVariant v = index.model()->data(index, Qt::EditRole);
   QLineEdit* edit;
   QComboBox* combo;
-  QList<QVariant> ql;
+  qlonglong id;
   switch (index.column()) {
+    case ReactCol::ID:
+      edit = qobject_cast<QLineEdit*>(editor);
+      Q_ASSERT(edit);
+      id = v.toLongLong();
+      edit->setText(QString::number(id));
+      break;
     case ReactCol::Name:
       edit = qobject_cast<QLineEdit*>(editor);
       Q_ASSERT(edit);
-      // the name property returns both the non-unique reaction name
-      // as well as the unique reaction id
-      ql = v.toList();
-      edit->setText(ql[0].toString());
+      edit->setText(v.toString());
       break;
     case ReactCol::Rate:
       edit = qobject_cast<QLineEdit*>(editor);
@@ -209,33 +217,3 @@ void ReactionModelDelegate::setModelData(QWidget *editor, QAbstractItemModel* mo
       break;
   }
 }
-
-
-// we need to re-implement the paint function to properly display the
-// reaction name since the model returns a QList<QVariant> containing
-// both the name and the unique reaction ID.
-void ReactionModelDelegate::paint(QPainter* painter,
-  const QStyleOptionViewItem &option, const QModelIndex &index) const {
-
-  if (index.column() == ReactCol::Name) {
-    QVariant v = index.model()->data(index, Qt::EditRole);
-    QList<QVariant> qv = v.toList();
-    drawDisplay(painter, option, option.rect, qv[0].toString());
-    drawFocus(painter, option, option.rect);
-  } else{
-    QItemDelegate::paint(painter, option, index);
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-

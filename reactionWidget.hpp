@@ -29,8 +29,6 @@ public:
     void setEditorData(QWidget *editor, const QModelIndex &index) const;
     void setModelData(QWidget *editor, QAbstractItemModel* model,
       const QModelIndex& index) const;
-    void paint(QPainter* paint, const QStyleOptionViewItem &option,
-      const QModelIndex &index) const;
 
 private:
 

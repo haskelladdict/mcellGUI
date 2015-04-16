@@ -36,7 +36,7 @@ using ReactList = std::vector<std::unique_ptr<Reaction>>;
 // ReactCol::col lists column names (one per data element in Reaction with
 // exception of products since the number of products is not fixed and unknown)
 namespace ReactCol {
-  enum col {Name, Rate, React1, React2, Type, Prod1};
+  enum col {ID, Name, Rate, React1, React2, Type, Prod1};
 }
 
 // ReactModel describes the QT MVC data model for reactions
@@ -76,8 +76,8 @@ private:
   long reactCount_;
   ReactList reactions_;
 
-  std::vector<QString> headerLabels_ = {"reaction name", "rate", "reactant 1",
-    "reactant2", "type", "product 1"};
+  std::vector<QString> headerLabels_ = {"id", "reaction name", "rate",
+    "reactant 1", "reactant2", "type", "product 1"};
   int numCols_;
 };
 

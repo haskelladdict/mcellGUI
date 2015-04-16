@@ -4,6 +4,8 @@
 //
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
+#include <QDebug>
+
 #include <algorithm>
 #include <cassert>
 
@@ -58,11 +60,12 @@ QVariant ReactionModel::data(const QModelIndex& index, int role) const {
 
   const Reaction* r = reactions_[row].get();
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
-    int col = index.column();
-    if (col == ReactCol::Name) {
+    if (col == ReactCol::ID) {
+      return r->id;
+    } else if (col == ReactCol::Name) {
       // we return both the name as well as the reaction id since only the
       // latter allows to uniquely identify a reaction (the name is not unique)
-      return QVariant(QList<QVariant>({r->name, r->id}));
+      return r->name;
     } else if (col == ReactCol::Rate) {
       return r->rate;
     } else if (col == ReactCol::React1) {
@@ -104,7 +107,9 @@ bool ReactionModel::setData(const QModelIndex& index, const QVariant& v, int rol
   }
 
   Reaction* r = reactions_[row].get();
-  if (col == ReactCol::Name) {
+  if (col == ReactCol::ID) {
+    r->id = v.toLongLong();
+  } else if (col == ReactCol::Name) {
     r->name = v.toString();
   } else if (col == ReactCol::Rate) {
     r->rate = v.toString();
@@ -142,7 +147,9 @@ bool ReactionModel::setData(const QModelIndex& index, const QVariant& v, int rol
 Qt::ItemFlags ReactionModel::flags(const QModelIndex& index) const {
   Qt::ItemFlags flags = QAbstractTableModel::flags(index);
   if (index.isValid()) {
-    flags |= Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+    if (index.column() != ReactCol::ID) {
+      flags |= Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+    }
   }
   return flags;
 }
