@@ -19,7 +19,7 @@ enum class MolType {SURF, VOL};
 
 // Molecule class stores the data for a single molecule
 struct Molecule {
-  long id;
+  qlonglong id;
   QString name;
   QString D;
   MolType type;
@@ -28,7 +28,7 @@ using MolList = std::vector<std::unique_ptr<Molecule>>;
 
 // Col names column types (one per data element in Molecule)
 namespace Col {
-  enum col {Name, D, Type};
+  enum col {ID, Name, D, Type};
 }
 
 // MolModel describes the QT MVC data model for molecules
@@ -56,7 +56,7 @@ public:
   // write methods
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
   void addMol(const QString& name, const QString& D, const MolType& type);
-  bool delMol(const QString& name);
+  bool delMol(qlonglong id);
 
 
 public slots:
@@ -70,7 +70,7 @@ private:
   std::map<int, int> molUseTracker_;
   MolList mols_;
 
-  std::vector<QString> headerLabels_ = {"molecule name", "D", "type"};
+  std::vector<QString> headerLabels_ = {"id", "molecule name", "D", "type"};
 };
 
 #endif

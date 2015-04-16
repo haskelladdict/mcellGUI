@@ -60,6 +60,8 @@ QVariant MolModel::data(const QModelIndex& index, int role) const {
   const Molecule* m = mols_[row].get();
   if (role == Qt::DisplayRole || role == Qt::EditRole) {
     switch (index.column()) {
+      case Col::ID:
+        return m->id;
       case Col::Name:
         return m->name;
       case Col::D:
@@ -93,6 +95,9 @@ bool MolModel::setData(const QModelIndex& index, const QVariant& value, int role
   Molecule* m = mols_[row].get();
   QString newName, D, type;
   switch (col) {
+    case Col::ID:
+      m->id = value.toLongLong();
+      break;
     case Col::Name:
       newName = value.toString();
       if (newName.isEmpty() || haveMol(newName)) {
@@ -124,7 +129,7 @@ bool MolModel::setData(const QModelIndex& index, const QVariant& value, int role
 // flags signals the model is read and writable
 Qt::ItemFlags MolModel::flags(const QModelIndex& index) const {
   Qt::ItemFlags flags = QAbstractTableModel::flags(index);
-  if (index.isValid()) {
+  if (index.isValid() && (index.column() != Col::ID)) {
     flags |= Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
   }
   return flags;
@@ -136,9 +141,9 @@ Qt::ItemFlags MolModel::flags(const QModelIndex& index) const {
 // we don't need to call beginRemoveRows and endRemoveRows
 // NOTE1: We also need to check that the model to be deleted is not curently
 // used by any view. If it is, we don't delete and return false instead.
-bool MolModel::delMol(const QString& name) {
+bool MolModel::delMol(qlonglong id) {
   auto it = std::find_if(mols_.begin(), mols_.end(),
-    [&name](std::unique_ptr<Molecule> const& p) { return p->name == name; });
+    [&id](std::unique_ptr<Molecule> const& p) { return p->id == id; });
   assert(it != mols_.end());
 
   // check that no part of the GUI references this molecule before deleting

@@ -65,7 +65,6 @@ void ReactionWidget::deleteReactions() {
   std::set<int> reactIDs;
   for (auto& r : uniqueRows) {
     auto ql = reactModel_->index(r, ReactCol::ID).data().toLongLong();
-    qDebug() << "deleting " << ql;
     reactIDs.insert(ql);
   }
   for (auto& i : reactIDs) {

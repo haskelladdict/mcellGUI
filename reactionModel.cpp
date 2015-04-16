@@ -146,10 +146,8 @@ bool ReactionModel::setData(const QModelIndex& index, const QVariant& v, int rol
 // flags signals the model is read and writable
 Qt::ItemFlags ReactionModel::flags(const QModelIndex& index) const {
   Qt::ItemFlags flags = QAbstractTableModel::flags(index);
-  if (index.isValid()) {
-    if (index.column() != ReactCol::ID) {
-      flags |= Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
-    }
+  if (index.isValid() && (index.column() != ReactCol::ID)) {
+    flags |= Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
   }
   return flags;
 }
@@ -187,6 +185,19 @@ void ReactionModel::delReaction(qlonglong reactID) {
   auto it = std::find_if(reactions_.begin(), reactions_.end(),
     [reactID] (const std::unique_ptr<Reaction> &p) { return p->id == reactID; });
   assert(it != reactions_.end());
+
+  Reaction* r = it->get();
+  if (r->reactant1 != nullptr) {
+    emit(unuseMol(r->reactant1->id));
+  }
+  if (r->reactant2 != nullptr) {
+    emit(unuseMol(r->reactant2->id));
+  }
+  for (auto *m : r->products) {
+    if (m != nullptr) {
+      emit(unuseMol(m->id));
+    }
+  }
 
   beginResetModel();
   reactions_.erase(it);

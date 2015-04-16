@@ -6,6 +6,7 @@
 
 #include <QDebug>
 
+#include <map>
 #include <set>
 
 #include <QComboBox>
@@ -41,6 +42,7 @@ void MolWidget::initModel(MolModel* model) {
   auto proxyModel = new QSortFilterProxyModel(this);
   proxyModel->setSourceModel(model);
   molTableView->setModel(proxyModel);
+  molTableView->setColumnHidden(0,true);
 }
 
 
@@ -58,14 +60,16 @@ void MolWidget::deleteMols() {
   for (auto& i : selIDs) {
     uniqueRows.insert(i.row());
   }
-  std::set<QString> molNames;
+  std::map<qlonglong, QString> molIDs;
   for (auto& r : uniqueRows) {
-    molNames.insert(model_->index(r, Col::Name).data().toString());
+    qlonglong id = model_->index(r, Col::ID).data().toLongLong();
+    QString name = model_->index(r, Col::Name).data().toString();
+    molIDs[id] = name;
   }
-  for (auto& n : molNames) {
-    bool ok = model_->delMol(n);
+  for (auto& m : molIDs) {
+    bool ok = model_->delMol(m.first);
     if (!ok) {
-      QString msg =  "Molecule " + n + " is still in use and can't be deleted.";
+      QString msg =  "Molecule " + m.second + " is still in use and can't be deleted.";
       QMessageBox::critical(this, tr("Molecule Still In Use"),
         tr(msg.toLatin1().data()), QMessageBox::Close);
     }
@@ -96,6 +100,9 @@ QWidget* MolModelDelegate::createEditor(QWidget *parent,
   QLineEdit* edit;
   QComboBox* comb;
   switch (index.column()) {
+    case Col::ID:
+      edit = new QLineEdit(parent);
+      return edit;
     case Col::Name:
       edit = new QLineEdit(parent);
       edit->setValidator(new QRegExpValidator(molNameRegex_));
@@ -121,7 +128,14 @@ void MolModelDelegate::setEditorData(QWidget* editor,
   QVariant v = index.model()->data(index, Qt::EditRole);
   QLineEdit* edit;
   QComboBox* combo;
+  qlonglong ql;
   switch (index.column()) {
+    case Col::ID:
+      edit = qobject_cast<QLineEdit*>(editor);
+      Q_ASSERT(edit);
+      ql = v.toLongLong();
+      edit->setText(QString::number(ql));
+      break;
     case Col::Name:
     case Col::D:
       edit = qobject_cast<QLineEdit*>(editor);
