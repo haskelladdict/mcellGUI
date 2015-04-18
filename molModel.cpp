@@ -228,7 +228,6 @@ void MolModel::markMoleculeUsed(long id) {
   } else {
     molUseTracker_[id] += 1;
   }
-  qDebug() << "using molecule " << id;
 }
 
 
@@ -238,7 +237,6 @@ void MolModel::markMoleculeUnused(long id) {
   assert(molUseTracker_.find(id) != molUseTracker_.end());
   assert(molUseTracker_[id] != 0);
   molUseTracker_[id] -= 1;
-  qDebug() << "un-using molecule " << id;
 }
 
 

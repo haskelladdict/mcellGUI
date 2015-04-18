@@ -27,6 +27,7 @@ int ReactionModel::columnCount(const QModelIndex& parent) const {
   return parent.isValid() ? 0 : numCols_;
 }
 
+
 // headerData prints the table headers
 QVariant ReactionModel::headerData(int section, Qt::Orientation orientation, int role) const {
   if (role != Qt::DisplayRole) {
@@ -45,6 +46,13 @@ QVariant ReactionModel::headerData(int section, Qt::Orientation orientation, int
   }
   return QVariant();
 }
+
+
+// getReactions returns the underlying list of reactions
+const ReactList& ReactionModel::getReactions() const {
+  return reactions_;
+}
+
 
 // data returns the data contained at index
 QVariant ReactionModel::data(const QModelIndex& index, int role) const {

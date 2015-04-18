@@ -4,6 +4,8 @@
 //
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
+#include <QDebug>
+
 #include <QFileDialog>
 
 #include "io.hpp"
@@ -16,17 +18,17 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags flags) :
   setupUi(this);
 
   // initialize and propagate models to view widgets
-  ParamModel* paramModel_ = new ParamModel(this);
+  paramModel_ = new ParamModel(this);
   paramTab->initModel(paramModel_);
 
-  NotificationsModel* noteModel_ = new NotificationsModel(this);
-  WarningsModel* warnModel_ = new WarningsModel(this);
+  noteModel_ = new NotificationsModel(this);
+  warnModel_ = new WarningsModel(this);
   noteWarnTab->initModel(noteModel_, warnModel_);
 
-  MolModel* moleculeModel_ = new MolModel(this);
+  moleculeModel_ = new MolModel(this);
   molTab->initModel(moleculeModel_);
 
-  ReactionModel* reactModel_ = new ReactionModel(this);
+  reactModel_ = new ReactionModel(this);
   reactTab->initModel(reactModel_, moleculeModel_);
 
   // connect reaction model to molecule tracked in molecule model
@@ -53,7 +55,7 @@ void MainWindow::exportMDL_() {
   if (mdlFileName.isEmpty()) {
     return;
   }
-  writeMDL(mdlFileName, moleculeModel_->getMols(), paramModel_, noteModel_,
-    warnModel_);
+  writeMDL(mdlFileName, moleculeModel_, paramModel_, noteModel_, warnModel_,
+    reactModel_);
 }
 

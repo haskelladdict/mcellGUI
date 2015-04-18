@@ -54,9 +54,7 @@ public:
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
   QVariant headerData(int section, Qt::Orientation orientation, int role) const;
   Qt::ItemFlags flags(const QModelIndex& index) const;
-
-//  bool hasReact(const QString& molName) const;
-//  const ReactList& getReactions() const;
+  const ReactList& getReactions() const;
 
   // write methods
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);

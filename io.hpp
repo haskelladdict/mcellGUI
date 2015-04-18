@@ -7,21 +7,21 @@
 #ifndef IO_HPP
 #define IO_HPP
 
-#include <QStandardItemModel>
-
-#include "molModel.hpp"
-#include "noteWarnModel.hpp"
-#include "paramModel.hpp"
-
+class MolModel;
+class ParamModel;
+class ReactionModel;
+class NotificationsModel;
+class WarningsModel;
 class QTextStream;
 
-bool writeMDL(QString fileName, const MolList& molecules,
-  const ParamModel& paramModel, const NotificationsModel& noteModel,
-  const WarningsModel& warnModel);
+bool writeMDL(QString fileName, const MolModel* molModel,
+  const ParamModel* paramModel, const NotificationsModel* noteModel,
+  const WarningsModel* warnModel, const ReactionModel* reactModel);
 
-void writeParams(QTextStream& out, const ParamModel& paramModel);
-void writeNotifications(QTextStream& out, const NotificationsModel& noteModel);
-void writeWarnings(QTextStream& out, const WarningsModel& noteModel);
-void writeMolecules(QTextStream& out, const MolList& molecules);
+void writeParams(QTextStream& out, const ParamModel* paramModel);
+void writeNotifications(QTextStream& out, const NotificationsModel* noteModel);
+void writeWarnings(QTextStream& out, const WarningsModel* noteModel);
+void writeMolecules(QTextStream& out, const MolModel* molModel);
+void writeReactions(QTextStream& out, const ReactionModel* reactModel);
 
 #endif
