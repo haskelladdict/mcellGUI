@@ -85,7 +85,7 @@ void ReactionWidget::addReaction() {
   // construct a default reaction
   QString id;
   QString reactName = "reac_" + id.setNum(reactCount_++);
-  Molecule* mol = molModel_->getMols()[1].get();
+  Molecule* mol = molModel_->getMols()[0].get();
   std::vector<const Molecule*> products;
   products.push_back(mol);
   reactModel_->addReaction(reactName, "0.0", mol, mol, ReactType::UNI, mol);
@@ -115,8 +115,7 @@ QWidget* ReactionModelDelegate::createEditor(QWidget *parent,
       return edit;
     case ReactCol::Type:
       comb = new QComboBox(parent);
-      comb->addItem("->");
-      comb->addItem("<->");
+      comb->addItems({"->", "<->"});
       return comb;
     case ReactCol::React1:
       comb = new QComboBox(parent);
@@ -126,6 +125,12 @@ QWidget* ReactionModelDelegate::createEditor(QWidget *parent,
       comb = new QComboBox(parent);
       comb->addItem("---");
       comb->addItems(molModel_->getMolNames());
+      return comb;
+    case ReactCol::Orient1:
+    case ReactCol::Orient2:
+    case ReactCol::Orient3:
+      comb = new QComboBox(parent);
+      comb->addItems({"", ";", "'", "''", "'''", ",", ",,", ",,,"});
       return comb;
     case ReactCol::Prod1:
       comb = new QComboBox(parent);
@@ -173,6 +178,18 @@ void ReactionModelDelegate::setEditorData(QWidget* editor,
       Q_ASSERT(combo);
       combo->setCurrentText(v.toString());
       break;
+    case ReactCol::Orient1:
+    case ReactCol::Orient2:
+    case ReactCol::Orient3:
+      combo = qobject_cast<QComboBox*>(editor);
+      Q_ASSERT(combo);
+      combo->setCurrentText(v.toString());
+      if (v.toString() == "") {
+        combo->setEnabled(false);
+      } else {
+        combo->setEnabled(true);
+      }
+      break;
     default:
       QItemDelegate::setEditorData(editor, index);
       break;
@@ -199,6 +216,9 @@ void ReactionModelDelegate::setModelData(QWidget *editor, QAbstractItemModel* mo
       model->setData(index, edit->text());
       break;
     case ReactCol::Type:
+    case ReactCol::Orient1:
+    case ReactCol::Orient2:
+    case ReactCol::Orient3:
       combo = qobject_cast<QComboBox*>(editor);
       Q_ASSERT(edit);
       model->setData(index, combo->currentText());

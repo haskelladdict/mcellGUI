@@ -147,7 +147,7 @@ bool MolModel::delMol(qlonglong id) {
   assert(it != mols_.end());
 
   // check that no part of the GUI references this molecule before deleting
-  long molID = it->get()->id;
+  long molID = (*it)->id;
   if (molUseTracker_.find(molID) != molUseTracker_.end() &&
       molUseTracker_[molID] != 0) {
     return false;

@@ -27,6 +27,15 @@ int ReactionModel::columnCount(const QModelIndex& parent) const {
   return parent.isValid() ? 0 : numCols_;
 }
 
+// isOriented returns if the reaction with index i is oriented, i.e. contains
+// 2D molecules or surfaces
+bool ReactionModel::isOriented(qlonglong reactID) {
+  auto it = std::find_if(reactions_.begin(), reactions_.end(),
+    [reactID] (const std::unique_ptr<Reaction> &p) { return p->id == reactID; });
+  assert(it != reactions_.end());
+  return (*it)->isOriented;
+}
+
 
 // headerData prints the table headers
 QVariant ReactionModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -74,6 +83,10 @@ QVariant ReactionModel::data(const QModelIndex& index, int role) const {
       // we return both the name as well as the reaction id since only the
       // latter allows to uniquely identify a reaction (the name is not unique)
       return r->name;
+    } else if (col == ReactCol::Orient1) {
+      return r->orient1;
+    } else if (col == ReactCol::Orient2) {
+      return r->orient2;
     } else if (col == ReactCol::Rate) {
       return r->rate;
     } else if (col == ReactCol::React1) {
@@ -114,7 +127,7 @@ bool ReactionModel::setData(const QModelIndex& index, const QVariant& v, int rol
     return false;
   }
 
-  Reaction* r = reactions_[row].get();
+  const auto& r = reactions_[row];
   if (col == ReactCol::ID) {
     r->id = v.toLongLong();
   } else if (col == ReactCol::Name) {
@@ -128,6 +141,7 @@ bool ReactionModel::setData(const QModelIndex& index, const QVariant& v, int rol
     r->reactant1 = static_cast<const Molecule*>(v.value<void *>());
     if (r->reactant1 != nullptr) {
       emit(useMol(r->reactant1->id));
+      setOriented(r);
     }
   } else if (col == ReactCol::React2) {
     if (r->reactant2 != nullptr) {
@@ -136,7 +150,20 @@ bool ReactionModel::setData(const QModelIndex& index, const QVariant& v, int rol
     r->reactant2 = static_cast<const Molecule*>(v.value<void *>());
     if (r->reactant2 != nullptr) {
       emit(useMol(r->reactant2->id));
+      setOriented(r);
     }
+  } else if (col == ReactCol::Orient1) {
+    QString orient = v.toString();
+    if ((r->isOriented && orient == "") || (!r->isOriented && orient != "")) {
+      return false;
+    }
+    r->orient1 = v.toString();
+  } else if (col == ReactCol::Orient2) {
+    QString orient = v.toString();
+    if ((r->isOriented && orient == "") || (!r->isOriented && orient != "")) {
+      return false;
+    }
+    r->orient2 = v.toString();
   } else if (col == ReactCol::Type) {
     if (v.toString() == "->") {
       r->type = ReactType::UNI;
@@ -167,20 +194,26 @@ Qt::ItemFlags ReactionModel::flags(const QModelIndex& index) const {
 void ReactionModel::addReaction(const QString& reactName, const QString& rate,
     const Molecule* react1, const Molecule* react2, const ReactType& type,
     const Molecule* prod1) {
-  auto r = std::unique_ptr<Reaction>(new Reaction);
+  auto r = ReactPtr(new Reaction);
   r->id = reactCount_++;
   r->name = reactName;
   r->rate = rate;
+  r->type = type;
+  r->isOriented = (react1->type == MolType::SURF) ||
+    (react2->type == MolType::SURF) || (prod1->type == MolType::SURF);
+
   r->reactant1 = react1;
   emit(useMol(react1->id));
+  r->orient1 = "";
 
   r->reactant2 = react2;
   emit(useMol(react2->id));
+  r->orient2 = "";
 
-  r->type = type;
-  std::vector<const Molecule*> products{prod1};
+  r->products.push_back(prod1);
   emit(useMol(prod1->id));
-  r->products = std::move(products);
+  r->prodOrients.push_back("");
+  setOriented(r);
 
   beginResetModel();
   reactions_.push_back(std::move(r));
@@ -194,14 +227,13 @@ void ReactionModel::delReaction(qlonglong reactID) {
     [reactID] (const std::unique_ptr<Reaction> &p) { return p->id == reactID; });
   assert(it != reactions_.end());
 
-  Reaction* r = it->get();
-  if (r->reactant1 != nullptr) {
-    emit(unuseMol(r->reactant1->id));
+  if ((*it)->reactant1 != nullptr) {
+    emit(unuseMol((*it)->reactant1->id));
   }
-  if (r->reactant2 != nullptr) {
-    emit(unuseMol(r->reactant2->id));
+  if ((*it)->reactant2 != nullptr) {
+    emit(unuseMol((*it)->reactant2->id));
   }
-  for (auto *m : r->products) {
+  for (auto *m : (*it)->products) {
     if (m != nullptr) {
       emit(unuseMol(m->id));
     }
@@ -211,4 +243,26 @@ void ReactionModel::delReaction(qlonglong reactID) {
   reactions_.erase(it);
   endResetModel();
 }
+
+
+// setOriented checks if a reaction should be oriented and then sets isOriented
+// appropriately. It also adjust the content of the orient properties to
+// properly reflect the orientation.
+void setOriented(const ReactPtr& p) {
+  if (p->reactant1->type == MolType::SURF || p->reactant2->type == MolType::SURF) {
+    if (!p->isOriented) {
+      p->orient1 = ";";
+      p->orient2 = ";";
+      p->isOriented = true;
+    }
+  } else if (p->isOriented) {
+    p->orient1 = "";
+    p->orient2 = "";
+    p->isOriented = false;
+  }
+}
+
+
+
+
 

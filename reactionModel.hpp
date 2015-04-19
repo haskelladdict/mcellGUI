@@ -23,21 +23,37 @@ enum class ReactType {UNI, BI};
 
 // Reaction class stores the data for a single reaction
 struct Reaction {
+  // properties
   qlonglong id;
+  bool isOriented; // does this reaction require orientations
   QString name;
   QString rate;
-  const Molecule* reactant1;
-  const Molecule* reactant2;
   ReactType type;
+
+  // reactants
+  const Molecule* reactant1;
+  QString orient1;
+  const Molecule* reactant2;
+  QString orient2;
+
+  // products
   std::vector<const Molecule*> products;
+  std::vector<QString> prodOrients;
 };
-using ReactList = std::vector<std::unique_ptr<Reaction>>;
+using ReactPtr = std::unique_ptr<Reaction>;
+using ReactList = std::vector<ReactPtr>;
 
 // ReactCol::col lists column names (one per data element in Reaction with
 // exception of products since the number of products is not fixed and unknown)
 namespace ReactCol {
-  enum col {ID, Name, Rate, React1, React2, Type, Prod1};
+  enum col {ID, Name, Rate, React1, Orient1, React2, Orient2, Type, Prod1,
+    Orient3};
 }
+
+// setOriented checks if a reaction should be oriented and sets isOriented
+// appropriately
+void setOriented(const ReactPtr& p);
+
 
 // ReactModel describes the QT MVC data model for reactions
 class ReactionModel : public QAbstractTableModel {
@@ -54,6 +70,7 @@ public:
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
   QVariant headerData(int section, Qt::Orientation orientation, int role) const;
   Qt::ItemFlags flags(const QModelIndex& index) const;
+  bool isOriented(qlonglong ID);
   const ReactList& getReactions() const;
 
   // write methods
@@ -61,7 +78,7 @@ public:
   void addReaction(const QString& reactName, const QString& rate,
     const Molecule* react1, const Molecule* react2, const ReactType& type,
     const Molecule* prod1);
-  void delReaction(qlonglong rowID);
+  void delReaction(qlonglong ID);
 
 
 signals:
@@ -75,7 +92,8 @@ private:
   ReactList reactions_;
 
   std::vector<QString> headerLabels_ = {"id", "reaction name", "rate",
-    "reactant 1", "reactant2", "type", "product 1"};
+    "reactant1", "orient1", "reactant2", "orient2", "type", "product1",
+    "orient3"};
   int numCols_;
 };
 
