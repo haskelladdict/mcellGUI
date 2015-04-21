@@ -21,7 +21,7 @@ ReactionWidget::ReactionWidget(QWidget* parent, Qt::WindowFlags flags) :
   QWidget(parent, flags) {
 
   setupUi(this);
-  reactTableView->setSortingEnabled(true);
+  //reactListView->setSortingEnabled(true);
 
   connect(addReactionButton, SIGNAL(clicked()), this, SLOT(addReaction()));
   connect(deleteReactionsButton, SIGNAL(clicked()), this, SLOT(deleteReactions()));
@@ -42,16 +42,17 @@ void ReactionWidget::initModel(ReactionModel* reactModel, MolModel* molModel) {
 
   auto proxyModel = new QSortFilterProxyModel(this);
   proxyModel->setSourceModel(reactModel_);
-  reactTableView->setModel(proxyModel);
-  reactTableView->setColumnHidden(0,true);
+  reactListView->setModel(proxyModel);
+  //reactTableView->setColumnHidden(0,true);
 
   ReactionModelDelegate* del = new ReactionModelDelegate(molModel, this);
-  reactTableView->setItemDelegate(del);
+  reactListView->setItemDelegate(del);
 }
 
 
 // deleteReactions deletes all currently selected molecules from the model
 void ReactionWidget::deleteReactions() {
+  /*
   auto selModel = reactTableView->selectionModel();
   auto selIDs = selModel->selectedIndexes();
   if (selIDs.size() == 0) {
@@ -70,6 +71,7 @@ void ReactionWidget::deleteReactions() {
   for (auto& i : reactIDs) {
     reactModel_->delReaction(i);
   }
+  */
 }
 
 
