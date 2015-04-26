@@ -4,6 +4,7 @@
 //
 // mcellGUI is a simulation GUI for MCell (www.mcell.org)
 
+#include <cassert>
 #include <QDebug>
 
 #include <set>
@@ -36,17 +37,17 @@ ReactionWidget::ReactionWidget(QWidget* parent, Qt::WindowFlags flags) :
 
 // initModel initializes the widget's underlying reaction model. In addition
 // to the ReactionModel, the widget also keeps track of the MoleculeModel
-void ReactionWidget::initModel(ReactionModel* reactModel, MolModel* molModel) {
+void ReactionWidget::initModel(ReactTreeModel* reactModel, MolModel* molModel) {
   reactModel_ = reactModel;
   molModel_ = molModel;
 
-  auto proxyModel = new QSortFilterProxyModel(this);
-  proxyModel->setSourceModel(reactModel_);
-  reactListView->setModel(proxyModel);
+  //auto proxyModel = new QSortFilterProxyModel(this);
+  //proxyModel->setSourceModel(reactModel_);
+  reactTreeView->setModel(reactModel_);
   //reactTableView->setColumnHidden(0,true);
 
-  ReactionModelDelegate* del = new ReactionModelDelegate(molModel, this);
-  reactListView->setItemDelegate(del);
+  //ReactionModelDelegate* del = new ReactModelDelegate(molModel, this);
+  reactTreeView->setItemDelegate(new ReactModelDelegate(molModel, this));
 }
 
 
@@ -90,51 +91,36 @@ void ReactionWidget::addReaction() {
   Molecule* mol = molModel_->getMols()[0].get();
   std::vector<const Molecule*> products;
   products.push_back(mol);
-  reactModel_->addReaction(reactName, "0.0", mol, mol, ReactType::UNI, mol);
+  reactModel_->addReaction(reactName, "0.0", mol, mol, mol);
 }
 
 
-// ReactionModelDelegate constructor
+// ReactModelDelegate constructor
 // NOTE: The delegate needs access to the molModel in order to populate
 // properly populate the molecule selectors with the available molecule names
-ReactionModelDelegate::ReactionModelDelegate(const MolModel* molModel,
+ReactModelDelegate::ReactModelDelegate(const MolModel* molModel,
   QWidget *parent) : QItemDelegate(parent), molModel_(molModel) {};
 
 
 // createEditor creates the appropriate editor for each of the columns
-QWidget* ReactionModelDelegate::createEditor(QWidget *parent,
+QWidget* ReactModelDelegate::createEditor(QWidget *parent,
   const QStyleOptionViewItem &option, const QModelIndex &index) const {
 
   Q_UNUSED(option)
 
   QLineEdit* edit;
   QComboBox* comb;
-  switch (index.column()) {
-    case ReactCol::ID:
-    case ReactCol::Name:
-    case ReactCol::Rate:
+  ReactItem* item = static_cast<ReactItem*>(index.internalPointer());
+  switch (item->type()) {
+    case ReactItemType::Name:
+    case ReactItemType::Rate:
       edit = new QLineEdit(parent);
       return edit;
-    case ReactCol::Type:
-      comb = new QComboBox(parent);
-      comb->addItems({"->", "<->"});
-      return comb;
-    case ReactCol::React1:
+    case ReactItemType::Reactant:
       comb = new QComboBox(parent);
       comb->addItems(molModel_->getMolNames());
       return comb;
-    case ReactCol::React2:
-      comb = new QComboBox(parent);
-      comb->addItem("---");
-      comb->addItems(molModel_->getMolNames());
-      return comb;
-    case ReactCol::Orient1:
-    case ReactCol::Orient2:
-    case ReactCol::Orient3:
-      comb = new QComboBox(parent);
-      comb->addItems({"", ";", "'", "''", "'''", ",", ",,", ",,,"});
-      return comb;
-    case ReactCol::Prod1:
+    case ReactItemType::Product:
       comb = new QComboBox(parent);
       comb->addItem("NULL");
       comb->addItems(molModel_->getMolNames());
@@ -147,50 +133,31 @@ QWidget* ReactionModelDelegate::createEditor(QWidget *parent,
 
 
 // setEditorData reads the data and writes it to the editor
-void ReactionModelDelegate::setEditorData(QWidget* editor,
+void ReactModelDelegate::setEditorData(QWidget* editor,
   const QModelIndex& index) const {
 
   QVariant v = index.model()->data(index, Qt::EditRole);
+  ReactItem* item = static_cast<ReactItem*>(index.internalPointer());
   QLineEdit* edit;
   QComboBox* combo;
   qlonglong id;
-  switch (index.column()) {
-    case ReactCol::ID:
-      edit = qobject_cast<QLineEdit*>(editor);
-      Q_ASSERT(edit);
-      id = v.toLongLong();
-      edit->setText(QString::number(id));
-      break;
-    case ReactCol::Name:
+  switch (item->type()) {
+    case ReactItemType::Name:
       edit = qobject_cast<QLineEdit*>(editor);
       Q_ASSERT(edit);
       edit->setText(v.toString());
       break;
-    case ReactCol::Rate:
+    case ReactItemType::Rate:
       edit = qobject_cast<QLineEdit*>(editor);
       Q_ASSERT(edit);
       edit->setValidator(new QDoubleValidator);
       edit->setText(v.toString());
       break;
-    case ReactCol::Type:
-    case ReactCol::React1:
-    case ReactCol::React2:
-    case ReactCol::Prod1:
+    case ReactItemType::Reactant:
+    case ReactItemType::Product:
       combo = qobject_cast<QComboBox*>(editor);
       Q_ASSERT(combo);
       combo->setCurrentText(v.toString());
-      break;
-    case ReactCol::Orient1:
-    case ReactCol::Orient2:
-    case ReactCol::Orient3:
-      combo = qobject_cast<QComboBox*>(editor);
-      Q_ASSERT(combo);
-      combo->setCurrentText(v.toString());
-      if (v.toString() == "") {
-        combo->setEnabled(false);
-      } else {
-        combo->setEnabled(true);
-      }
       break;
     default:
       QItemDelegate::setEditorData(editor, index);
@@ -203,31 +170,23 @@ void ReactionModelDelegate::setEditorData(QWidget* editor,
 // NOTE: Currently we send the molecule info to the reaction model as void
 // pointers within a QVariant. This seems a bit hackish and could perhaps be
 // improved.
-void ReactionModelDelegate::setModelData(QWidget *editor, QAbstractItemModel* model,
+void ReactModelDelegate::setModelData(QWidget *editor, QAbstractItemModel* model,
   const QModelIndex& index) const {
 
   QLineEdit* edit;
   QComboBox* combo;
   QVariant v;
+  ReactItem* item = static_cast<ReactItem*>(index.internalPointer());
   const Molecule* mol;
-  switch (index.column()) {
-    case ReactCol::Name:
-    case ReactCol::Rate:
+  switch (item->type()) {
+    case ReactItemType::Name:
+    case ReactItemType::Rate:
       edit = qobject_cast<QLineEdit*>(editor);
       Q_ASSERT(edit);
       model->setData(index, edit->text());
       break;
-    case ReactCol::Type:
-    case ReactCol::Orient1:
-    case ReactCol::Orient2:
-    case ReactCol::Orient3:
-      combo = qobject_cast<QComboBox*>(editor);
-      Q_ASSERT(edit);
-      model->setData(index, combo->currentText());
-      break;
-    case ReactCol::React1:
-    case ReactCol::React2:
-    case ReactCol::Prod1:
+    case ReactItemType::Reactant:
+    case ReactItemType::Product:
       combo = qobject_cast<QComboBox*>(editor);
       mol = molModel_->getMolecule(combo->currentText());
       v = qVariantFromValue((void *)mol);

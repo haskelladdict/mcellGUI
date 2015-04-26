@@ -21,7 +21,7 @@ const QString TAB("  ");
 // This function returns true if it succeeds and false otherwise.
 bool writeMDL(QString fileName, const MolModel* molModel,
   const ParamModel* paramModel, const NotificationsModel* noteModel,
-  const WarningsModel* warnModel, const ReactionModel* reactModel) {
+  const WarningsModel* warnModel, const ReactTreeModel* reactModel) {
 
   QFile file(fileName);
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -36,7 +36,7 @@ bool writeMDL(QString fileName, const MolModel* molModel,
   out << "\n";
   writeMolecules(out, molModel);
   out << "\n";
-  writeReactions(out, reactModel);
+  //writeReactions(out, reactModel);
 
   return true;
 }
@@ -100,6 +100,7 @@ void writeMolecules(QTextStream& out, const MolModel* molModel) {
   out << "}\n";
 }
 
+#if 0
 // writeReactinos writes the molecule info to the QTextStream.
 void writeReactions(QTextStream& out, const ReactionModel* reactModel) {
 
@@ -111,3 +112,4 @@ void writeReactions(QTextStream& out, const ReactionModel* reactModel) {
   }
   out << "}\n";
 }
+#endif

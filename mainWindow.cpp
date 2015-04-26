@@ -28,13 +28,13 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags flags) :
   moleculeModel_ = new MolModel(this);
   molTab->initModel(moleculeModel_);
 
-  reactModel_ = new ReactionModel(this);
-  reactTab->initModel(reactModel_, moleculeModel_);
+  reactTreeModel_ = new ReactTreeModel(this);
+  reactTab->initModel(reactTreeModel_, moleculeModel_);
 
   // connect reaction model to molecule tracked in molecule model
-  connect(reactModel_, SIGNAL(useMol(long)), moleculeModel_,
+  connect(reactTreeModel_, SIGNAL(useMol(long)), moleculeModel_,
     SLOT(markMoleculeUsed(long)));
-  connect(reactModel_, SIGNAL(unuseMol(long)), moleculeModel_,
+  connect(reactTreeModel_, SIGNAL(unuseMol(long)), moleculeModel_,
     SLOT(markMoleculeUnused(long)));
 
   // add some fake molecule data
@@ -56,6 +56,6 @@ void MainWindow::exportMDL_() {
     return;
   }
   writeMDL(mdlFileName, moleculeModel_, paramModel_, noteModel_, warnModel_,
-    reactModel_);
+    reactTreeModel_);
 }
 

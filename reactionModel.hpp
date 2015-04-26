@@ -11,74 +11,90 @@
 #include <memory>
 #include <vector>
 
-#include <QAbstractTableModel>
+#include <QAbstractListModel>
 #include <QList>
 #include <QString>
 
 #include "molModel.hpp"
 
-// ReactType classifies the type of reaction. Currently only uni and
-// bidirectional are supported
-enum class ReactType {UNI, BI};
 
-// Reaction class stores the data for a single reaction
-struct Reaction {
-  // properties
-  qlonglong id;
-  bool isOriented; // does this reaction require orientations
-  QString name;
-  QString rate;
-  ReactType type;
-
-  // reactants
-  const Molecule* reactant1;
-  QString orient1;
-  const Molecule* reactant2;
-  QString orient2;
-
-  // products
-  std::vector<const Molecule*> products;
-  std::vector<QString> prodOrients;
+// this enum describes the type of ReactItem
+enum class ReactItemType {Repr, ReactantTag, Reactant, ProductTag, Product,
+  TypeTag, Type, RateTag, Rate, NameTag, Name
 };
-using ReactPtr = std::unique_ptr<Reaction>;
-using ReactList = std::vector<ReactPtr>;
-
-// ReactCol::col lists column names (one per data element in Reaction with
-// exception of products since the number of products is not fixed and unknown)
-namespace ReactCol {
-  enum col {ID, Name, Rate, React1, Orient1, React2, Orient2, Type, Prod1,
-    Orient3};
-}
-
-// setOriented checks if a reaction should be oriented and sets isOriented
-// appropriately
-void setOriented(const ReactPtr& p);
 
 
-// ReactModel describes the QT MVC data model for reactions
-class ReactionModel : public QAbstractTableModel {
 
-  Q_OBJECT
+// ReactItem constitutes a single row entry in the ReactTreeModel and describes
+// both editable properties (like reactants, products, name, rate) as well as
+// non-editable headers.
+class ReactItem {
 
 public:
-  ReactionModel(QObject* parent = 0);
 
-  int rowCount(const QModelIndex& parent = QModelIndex()) const ;
-  int columnCount(const QModelIndex& parent = QModelIndex()) const;
+  explicit ReactItem(const ReactItemType& type, const QString& name,
+    const Molecule* mol = nullptr, ReactItem* parent = nullptr);
+  ~ReactItem();
 
-  // read methods
-  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+  QString name() const;
+  ReactItemType type() const;
+  bool isEditable() const;
+
+  ReactItem* parent() const;
+  ReactItem* childAt(int row) const;
+  const QList<ReactItem*> children() const;
+  const Molecule* mol() const;
+  int rowOfChild(ReactItem* child) const;
+  int childCount() const;
+
+  void setName(const QString& name);
+  void setMol(const Molecule* mol);
+
+  void insertChild(int row, ReactItem* item);
+  void addChild(ReactItem* item);
+  ReactItem* takeChild(int row);
+
+
+private:
+
+  QString makeReactionString_() const;
+
+  ReactItemType type_;
+  QString name_;
+  const Molecule* mol_;
+
+  ReactItem* parent_;
+  QList<ReactItem*> children_;
+};
+
+
+
+// ReactTreeModel encapsulates the currently defined reactions as a tree model
+class ReactTreeModel : public QAbstractItemModel {
+
+ Q_OBJECT
+
+public:
+
+  explicit ReactTreeModel(QObject* parent = nullptr);
+  ~ReactTreeModel();
+
   Qt::ItemFlags flags(const QModelIndex& index) const;
-  bool isOriented(qlonglong ID);
-  const ReactList& getReactions() const;
+  QVariant data(const QModelIndex& index, int role) const;
+  QVariant headerData(int section, Qt::Orientation orient, int role) const;
+  QModelIndex index(int row, int column, const QModelIndex& parent) const;
+  QModelIndex parent(const QModelIndex& index) const;
+  int rowCount(const QModelIndex& index) const;
+  int columnCount(const QModelIndex& index) const;
 
-  // write methods
-  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
-  void addReaction(const QString& reactName, const QString& rate,
-    const Molecule* react1, const Molecule* react2, const ReactType& type,
-    const Molecule* prod1);
-  void delReaction(qlonglong ID);
+  bool setHeaderData(int section, Qt::Orientation orient, const QVariant& value,
+    int role = Qt::EditRole);
+  bool setData(const QModelIndex& index, const QVariant& value, int role);
+  bool insertRows(int row, int count, const QModelIndex& parent);
+  bool removeRows(int row, int count, const QModelIndex& parent);
+
+  void addReaction(const QString& reactName, const QString& rate, const Molecule* react1,
+    const Molecule* react2, const Molecule* prod1);
 
 
 signals:
@@ -88,13 +104,13 @@ signals:
 
 
 private:
-  long reactCount_;
-  ReactList reactions_;
 
-  std::vector<QString> headerLabels_ = {"id", "reaction name", "rate",
-    "reactant1", "orient1", "reactant2", "orient2", "type", "product1",
-    "orient3"};
-  int numCols_;
+  ReactItem* itemForIndex_(const QModelIndex& index) const;
+
+  const int columnCount_ = 1;
+  ReactItem* root_;
+
 };
+
 
 #endif

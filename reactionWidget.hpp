@@ -16,13 +16,14 @@
 #include "ui_reactionWidget.h"
 
 
-// ReactionModelDelegate defines custom delegates for the ReactionModel view
-class ReactionModelDelegate : public QItemDelegate {
+
+// ReactModelDelegate defines custom delegates for the ReactTreeModel view
+class ReactModelDelegate : public QItemDelegate {
 
     Q_OBJECT
 
 public:
-    ReactionModelDelegate(const MolModel* molModel, QWidget *parent = 0);
+    ReactModelDelegate(const MolModel* molModel, QWidget *parent = 0);
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                           const QModelIndex &index) const;
@@ -45,12 +46,12 @@ public:
 
   ReactionWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
 
-  void initModel(ReactionModel* reactModel, MolModel* molModel);
+  void initModel(ReactTreeModel* reactModel, MolModel* molModel);
 
 private:
 
   int reactCount_ = 0;
-  ReactionModel* reactModel_;
+  ReactTreeModel* reactModel_;
   const MolModel* molModel_;
 
 private slots:

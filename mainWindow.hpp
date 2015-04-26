@@ -32,7 +32,7 @@ private:
   ParamModel* paramModel_;
   NotificationsModel* noteModel_;
   WarningsModel* warnModel_;
-  ReactionModel* reactModel_;
+  ReactTreeModel* reactTreeModel_;
 
 private slots:
 
